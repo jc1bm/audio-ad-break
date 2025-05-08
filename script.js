@@ -1,6 +1,11 @@
 function createAdBreak() {
-    let sting = document.getElementById('sting').value;
-    let ad1 = document.getElementById('ad1').value;
+let station = document.getElementById('station').value;
+let gap1 = document.getElementById('gap1').value;
+let ad2 = document.getElementById('ad2').value;
+let gap2 = document.getElementById('gap2').value;
+
+let audioFiles = [station, gap1, ad2, gap2];
+
 
     let audioFiles = [sting, ad1]; // Add all selected files
 
