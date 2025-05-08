@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Audio Ad Break</title>
+  <title>Ad-In-Situ Maker</title>
 </head>
 <body>
 
@@ -13,9 +13,19 @@
     <option value="audio/station/sting2.wav">Sting 2</option>
   </select>
 
-  <select id="ad1">
+    <select id="gap">
+    <option value="audio/station/gap.mp3">Gap</option>
+    <option value="audio/station/none.wav">None</option>
+  </select>
+
+  <select id="ad2">
     <option value="audio/station/ad1.wav">Ad 1</option>
     <option value="audio/station/ad2.wav">Ad 2</option>
+  </select>
+
+  <select id="gap">
+    <option value="audio/station/gap.mp3">Gap</option>
+    <option value="audio/station/none.wav">None</option>
   </select>
 
   <button onclick="createAdBreak()">Generate Ad Break</button>
