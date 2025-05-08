@@ -17,6 +17,7 @@ function createAdBreak() {
         document.getElementById('ad7').value,
         document.getElementById('gap7').value,
         document.getElementById('station_out').value
+        document.getElementById('target').value
     ];
 
     let audioContext = new AudioContext();
