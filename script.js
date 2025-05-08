@@ -1,52 +1,100 @@
 function createAdBreak() {
-    let sting = document.getElementById('sting').value;
-    let ad1 = document.getElementById('ad1').value;
+    const sting = document.getElementById('station').value;
+    const ad1 = document.getElementById('ad1').value;
+    const ad2 = document.getElementById('ad2').value;
+    const ad3 = document.getElementById('ad3').value;
+    const exportAsVideo = document.getElementById('exportAsVideo').checked;
+    const imagePath = document.getElementById('image').value;
 
-    let audioFiles = [sting, ad1]; // Add all selected files
-
-    let audioContext = new AudioContext();
+    const audioFiles = [sting, ad1, ad2, ad3];
+    const audioContext = new AudioContext();
     let finalBuffer = null;
 
     async function fetchAudio(url) {
-        let response = await fetch(url);
-        let arrayBuffer = await response.arrayBuffer();
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
         return await audioContext.decodeAudioData(arrayBuffer);
     }
 
     async function mergeAudio() {
-        let buffers = await Promise.all(audioFiles.map(fetchAudio));
-        let totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
+        const buffers = await Promise.all(audioFiles.map(fetchAudio));
+        const totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
         finalBuffer = audioContext.createBuffer(1, totalLength, audioContext.sampleRate);
-        
+
         let offset = 0;
         buffers.forEach(buffer => {
             finalBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
             offset += buffer.length;
         });
 
-        saveAudio(finalBuffer);
+        if (exportAsVideo) {
+            await exportWebM(finalBuffer, imagePath);
+        } else {
+            saveAudio(finalBuffer);
+        }
     }
 
-    async function saveAudio(buffer) {
-        let wavBlob = bufferToWave(buffer, buffer.length);
-        let url = URL.createObjectURL(wavBlob);
-        let a = document.createElement('a');
+    function saveAudio(buffer) {
+        const wavBlob = bufferToWave(buffer, buffer.length);
+        const url = URL.createObjectURL(wavBlob);
+        const a = document.createElement('a');
         a.href = url;
         a.download = 'custom_ad_break.wav';
         a.click();
     }
 
-    function bufferToWave(abuffer, len) {
-        let numOfChan = abuffer.numberOfChannels,
-            length = len * numOfChan * 2 + 44,
-            buffer = new ArrayBuffer(length),
-            view = new DataView(buffer),
-            channels = [],
-            sampleRate = abuffer.sampleRate,
-            offset = 44,
-            pos = 0;
+    async function exportWebM(buffer, imagePath) {
+        const canvas = document.getElementById('videoCanvas');
+        const ctx = canvas.getContext('2d');
 
-        // WAV header
+        // Load image
+        const img = new Image();
+        img.src = imagePath;
+        await new Promise(resolve => {
+            img.onload = resolve;
+        });
+
+        // Draw image on canvas
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Stream canvas
+        const canvasStream = canvas.captureStream(30);
+        const audioDest = audioContext.createMediaStreamDestination();
+
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioDest);
+        source.start();
+
+        const combinedStream = new MediaStream([...canvasStream.getVideoTracks(), ...audioDest.stream.getAudioTracks()]);
+        const recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+
+        const chunks = [];
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'custom_ad_break.webm';
+            a.click();
+        };
+
+        recorder.start();
+        await new Promise(resolve => setTimeout(resolve, (buffer.duration + 0.5) * 1000));
+        recorder.stop();
+    }
+
+    function bufferToWave(abuffer, len) {
+        const numOfChan = abuffer.numberOfChannels;
+        const length = len * numOfChan * 2 + 44;
+        const buffer = new ArrayBuffer(length);
+        const view = new DataView(buffer);
+        const channels = [];
+        const sampleRate = abuffer.sampleRate;
+        let offset = 44;
+        let pos = 0;
+
         writeUTFBytes(view, 0, 'RIFF');
         view.setUint32(4, length - 8, true);
         writeUTFBytes(view, 8, 'WAVE');
@@ -61,7 +109,6 @@ function createAdBreak() {
         writeUTFBytes(view, 36, 'data');
         view.setUint32(40, length - 44, true);
 
-        // Write audio samples
         for (let i = 0; i < numOfChan; i++) {
             channels.push(abuffer.getChannelData(i));
         }
@@ -85,3 +132,4 @@ function createAdBreak() {
 
     mergeAudio();
 }
+
