@@ -107,6 +107,9 @@ function createAdBreak() {
 }
 
 async function createVideoFromAudio(audioBlob) {
+  const progress = document.getElementById('progressIndicator');
+  progress.textContent = 'Rendering video...';
+
   const image = new Image();
   const selectedImage = document.getElementById('coverImage').value;
   image.src = selectedImage;
@@ -120,9 +123,8 @@ async function createVideoFromAudio(audioBlob) {
 
   const stream = canvas.captureStream(30); // 30 FPS
 
-  // Set up audio
   const audioContext = new AudioContext();
-  await audioContext.resume(); // Important on some browsers
+  await audioContext.resume();
 
   const audio = new Audio(URL.createObjectURL(audioBlob));
   const source = audioContext.createMediaElementSource(audio);
@@ -130,10 +132,8 @@ async function createVideoFromAudio(audioBlob) {
   source.connect(dest);
   source.connect(audioContext.destination);
 
-  // Add audio track to stream
   stream.addTrack(dest.stream.getAudioTracks()[0]);
 
-  // Record the combined stream
   const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
   const chunks = [];
 
@@ -150,24 +150,26 @@ async function createVideoFromAudio(audioBlob) {
     a.href = url;
     a.download = 'custom_ad_break.webm';
     a.click();
+
+    progress.textContent = 'Video download complete!';
+    setTimeout(() => {
+      progress.textContent = '';
+    }, 3000);
   };
 
   recorder.start();
   audio.play();
 
-  // Stop recording after audio ends
   audio.onended = () => {
     recorder.stop();
   };
 
-  // Fallback: Stop after max 60 seconds if onended fails
   setTimeout(() => {
     if (recorder.state !== 'inactive') {
       recorder.stop();
     }
   }, 60000);
 }
-
 
 // Expose to global scope
 window.handleAdBreak = function () {
