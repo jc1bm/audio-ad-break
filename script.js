@@ -42,14 +42,38 @@ function createAdBreak() {
         saveAudio(finalBuffer);
     }
 
-    async function saveAudio(buffer) {
-        let wavBlob = bufferToWave(buffer, buffer.length);
-        let url = URL.createObjectURL(wavBlob);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = 'custom_ad_break.wav';
-        a.click();
-    }
+async function saveAudio(buffer) {
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: true });
+
+    await ffmpeg.load();
+
+    const wavBlob = bufferToWave(buffer, buffer.length);
+    const wavFile = new File([wavBlob], 'input.wav');
+
+    // Write input file to FFmpeg FS
+    ffmpeg.FS('writeFile', 'input.wav', await fetchFile(wavFile));
+
+    // Convert WAV to MP4 (silent video with audio track)
+    await ffmpeg.run(
+        '-i', 'input.wav',
+        '-f', 'mp4',
+        '-c:a', 'aac',
+        '-b:a', '192k',
+        '-vn', // no video
+        'output.mp4'
+    );
+
+    // Read back the result
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(mp4Blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'custom_ad_break.mp4';
+    a.click();
+}
 
     function bufferToWave(abuffer, len) {
         let numOfChan = abuffer.numberOfChannels,
