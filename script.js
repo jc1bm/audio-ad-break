@@ -1,103 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Ad-In-Situ Maker</title>
-</head>
-<body>
-  <h1>Ad-In-Situ Maker</h1>
+import { createFFmpeg, fetchFile } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.2/dist/esm/ffmpeg.mjs';
 
-  <!-- Station In -->
-  <select id="station_in">
-    <option value="audio/station/absolute.wav">Absolute</option>
-    <option value="audio/station/sting2.wav">Sting 2</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+const ffmpeg = createFFmpeg({ log: true });
 
-  <!-- Gaps and Ads -->
-  <!-- ... keep your full select structure here (unchanged) ... -->
+async function createAdBreak() {
+  if (!ffmpeg.isLoaded()) {
+    await ffmpeg.load();
+  }
 
-  <!-- Station Out -->
-  <br /><br />
-  <select id="station_out">
-    <option value="audio/station/absolute.wav">Absolute</option>
-    <option value="audio/station/sting2.wav">Sting 2</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+  const clips = [
+    document.getElementById('station_in').value,
+    document.getElementById('gap0').value,
+    document.getElementById('ad1').value,
+    document.getElementById('gap1').value,
+    document.getElementById('ad2').value,
+    document.getElementById('gap2').value,
+    document.getElementById('ad3').value,
+    document.getElementById('gap3').value,
+    document.getElementById('ad4').value,
+    document.getElementById('gap4').value,
+    document.getElementById('ad5').value,
+    document.getElementById('gap5').value,
+    document.getElementById('ad6').value,
+    document.getElementById('gap6').value,
+    document.getElementById('ad7').value,
+    document.getElementById('gap7').value,
+    document.getElementById('station_out').value,
+  ].filter(src => !src.includes('none.wav'));
 
-  <!-- Export Type -->
-  <br /><br />
-  <select id="exportType">
-    <option value="audio">Audio Only (WAV)</option>
-    <option value="video">Video with Image (MP4)</option>
-  </select>
+  const exportType = document.getElementById('exportType').value;
+  const imageFile = document.getElementById('imageInput')?.files?.[0];
 
-  <br /><br />
+  const listFile = 'input.txt';
+  const concatList = [];
 
-  <button onclick="createAdBreak()">Generate Ad Break</button>
+  // Load all audio files into ffmpeg FS
+  for (let i = 0; i < clips.length; i++) {
+    const name = `clip${i}.wav`;
+    const data = await fetchFile(clips[i]);
+    ffmpeg.FS('writeFile', name, data);
+    concatList.push(`file '${name}'`);
+  }
 
-  <!-- FFmpeg.wasm -->
-  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.2/dist/ffmpeg.min.js"></script>
+  // Write the concat list file
+  ffmpeg.FS('writeFile', listFile, concatList.join('\n'));
 
-  <!-- Main script logic -->
-  <script src="script.js" defer></script>
+  // Merge audio clips
+  await ffmpeg.run('-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', 'output.wav');
 
-  <!-- Dynamic format detection -->
-  <script>
-    async function resolveTargetFormat() {
-      const basePath = 'audio/ad/target';
-      const formats = ['.wav', '.mp3'];
-      let found = false;
+  // Export logic
+  if (exportType === 'audio') {
+    const output = ffmpeg.FS('readFile', 'output.wav');
+    downloadFile(output, 'ad-break.wav', 'audio/wav');
+  } else if (exportType === 'video' && imageFile) {
+    const imageName = 'cover.jpg';
+    ffmpeg.FS('writeFile', imageName, await fetchFile(imageFile));
 
-      for (const ext of formats) {
-        const url = basePath + ext;
-        try {
-          const res = await fetch(url, { method: 'HEAD' });
-          if (res.ok) {
-            updateTargetOption(ext);
-            found = true;
-            break;
-          }
-        } catch (e) {
-          console.warn(`Could not load ${url}`);
-        }
-      }
+    // Create a video with the still image and merged audio
+    await ffmpeg.run(
+      '-loop', '1',
+      '-i', imageName,
+      '-i', 'output.wav',
+      '-shortest',
+      '-c:v', 'libx264',
+      '-c:a', 'aac',
+      '-b:a', '192k',
+      '-pix_fmt', 'yuv420p',
+      'output.mp4'
+    );
 
-      if (!found) {
-        removeTargetOptions();
-      }
-    }
+    const output = ffmpeg.FS('readFile', 'output.mp4');
+    downloadFile(output, 'ad-break.mp4', 'video/mp4');
+  } else {
+    alert('Please select an image if exporting video.');
+  }
 
-    function updateTargetOption(ext) {
-      const selects = document.querySelectorAll('select');
-      selects.forEach(select => {
-        [...select.options].forEach(option => {
-          if (option.value.includes('audio/ad/target')) {
-            option.value = `audio/ad/target${ext}`;
-          }
-        });
-      });
-    }
+  // Cleanup
+  ffmpeg.FS('unlink', listFile);
+  clips.forEach((_, i) => ffmpeg.FS('unlink', `clip${i}.wav`));
+  if (exportType === 'video') {
+    ffmpeg.FS('unlink', 'output.wav');
+    ffmpeg.FS('unlink', 'cover.jpg');
+    ffmpeg.FS('unlink', 'output.mp4');
+  } else {
+    ffmpeg.FS('unlink', 'output.wav');
+  }
+}
 
-    function removeTargetOptions() {
-      const selects = document.querySelectorAll('select');
-      selects.forEach(select => {
-        [...select.options].forEach((option, i) => {
-          if (option.value.includes('audio/ad/target')) {
-            select.remove(i);
-          }
-        });
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', resolveTargetFormat);
-  </script>
-
-  <!-- Upload/clear links -->
-  <br /><br />
-  <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">Clear target audio</a>
-  <br /><br />
-  <a href="https://github.com/jc1bm/audio-ad-break/upload/main/audio/ad" target="_blank">Upload target audio</a>
-
-</body>
-</html>
+function downloadFile(data, filename, mimeType) {
+  const blob = new Blob([data.buffer], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
