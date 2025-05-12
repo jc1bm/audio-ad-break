@@ -42,13 +42,57 @@ function createAdBreak() {
         saveAudio(finalBuffer);
     }
 
-    async function saveAudio(buffer) {
-        let wavBlob = bufferToWave(buffer, buffer.length);
-        let url = URL.createObjectURL(wavBlob);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = 'custom_ad_break.wav';
-        a.click();
+async function saveAudio(buffer) {
+  const exportType = document.getElementById('exportFormat').value;
+  const wavBlob = bufferToWave(buffer, buffer.length);
+
+  if (exportType === 'audio') {
+    const url = URL.createObjectURL(wavBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'custom_ad_break.wav';
+    a.click();
+  } else if (exportType === 'video') {
+    await createVideoFromAudio(wavBlob);
+async function createVideoFromAudio(audioBlob) {
+  const image = new Image();
+  image.src = 'images/thumbnail.jpg'; // your still image path
+  await image.decode();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1280;
+  canvas.height = 720;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  const stream = canvas.captureStream(30); // 30 FPS
+  const audio = new Audio(URL.createObjectURL(audioBlob));
+  const audioContext = new AudioContext();
+  const source = audioContext.createMediaElementSource(audio);
+  const dest = audioContext.createMediaStreamDestination();
+  source.connect(dest);
+  source.connect(audioContext.destination);
+  stream.addTrack(dest.stream.getAudioTracks()[0]);
+
+  const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+  const chunks = [];
+
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.onstop = () => {
+    const videoBlob = new Blob(chunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(videoBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'custom_ad_break.webm';
+    a.click();
+  };
+
+  recorder.start();
+  audio.play();
+
+  // Stop recording when audio ends
+  audio.onended = () => recorder.stop();
+}
     }
 
     function bufferToWave(abuffer, len) {
