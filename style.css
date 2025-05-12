@@ -65,3 +65,22 @@ button:hover {
   text-decoration: underline;
 }
 
+.dropdown-container {
+  display: flex;
+  gap: 20px;
+}
+
+#progress-container {
+  margin-top: 20px;
+}
+
+progress {
+  width: 100%;
+}
+
+#coverImage {
+  width: 100%;
+  padding: 5px;
+}
+
+
