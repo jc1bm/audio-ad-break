@@ -28,93 +28,13 @@ function createAdBreak() {
     return await audioContext.decodeAudioData(arrayBuffer);
   }
 
-  async function mergeAudio() {
-    let buffers = await Promise.all(audioFiles.map(fetchAudio));
-    let totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
-    finalBuffer = audioContext.createBuffer(1, totalLength, audioContext.sampleRate);
-
-    let offset = 0;
-    buffers.forEach(buffer => {
-      finalBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
-      offset += buffer.length;
-    });
-
-    await saveAudio(finalBuffer);
-  }
-
-  async function saveAudio(buffer) {
-    const exportType = document.getElementById('exportType').value;
-    const wavBlob = bufferToWave(buffer, buffer.length);
-
-    if (exportType === 'audio') {
-      const url = URL.createObjectURL(wavBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'custom_ad_break.wav';
-      a.click();
-    } else if (exportType === 'video') {
-      await createVideoFromAudio(wavBlob);
-    }
-  }
-
-  function bufferToWave(abuffer, len) {
-    let numOfChan = abuffer.numberOfChannels,
-        length = len * numOfChan * 2 + 44,
-        buffer = new ArrayBuffer(length),
-        view = new DataView(buffer),
-        channels = [],
-        sampleRate = abuffer.sampleRate,
-        offset = 44,
-        pos = 0;
-
-    writeUTFBytes(view, 0, 'RIFF');
-    view.setUint32(4, length - 8, true);
-    writeUTFBytes(view, 8, 'WAVE');
-    writeUTFBytes(view, 12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, numOfChan, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2 * numOfChan, true);
-    view.setUint16(32, numOfChan * 2, true);
-    view.setUint16(34, 16, true);
-    writeUTFBytes(view, 36, 'data');
-    view.setUint32(40, length - 44, true);
-
-    for (let i = 0; i < numOfChan; i++) {
-      channels.push(abuffer.getChannelData(i));
-    }
-
-    while (pos < len) {
-      for (let i = 0; i < numOfChan; i++) {
-        view.setInt16(offset, channels[i][pos] * 0x7FFF, true);
-        offset += 2;
-      }
-      pos++;
-    }
-
-    return new Blob([buffer], { type: 'audio/wav' });
-  }
-
-  function writeUTFBytes(view, offset, string) {
-    for (let i = 0; i < string.length; i++) {
-      view.setUint8(offset + i, string.charCodeAt(i));
-    }
-  }
-
-  // Call mergeAudio function to process the selected files
-  mergeAudio();
-}
-
 async function createVideoFromAudio(audioBlob) {
-  const progress = document.getElementById('progressIndicator');
-  progress.textContent = 'Rendering video...';
-
   const image = new Image();
   const selectedImage = document.getElementById('coverImage').value;
   image.src = selectedImage;
   await image.decode();
 
+  // Prepare canvas
   const canvas = document.createElement('canvas');
   canvas.width = 1280;
   canvas.height = 720;
@@ -123,6 +43,7 @@ async function createVideoFromAudio(audioBlob) {
 
   const stream = canvas.captureStream(30); // 30 FPS
 
+  // Set up audio
   const audioContext = new AudioContext();
   await audioContext.resume();
 
@@ -132,15 +53,15 @@ async function createVideoFromAudio(audioBlob) {
   source.connect(dest);
   source.connect(audioContext.destination);
 
+  // Add audio track to stream
   stream.addTrack(dest.stream.getAudioTracks()[0]);
 
+  // Set up recorder
   const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
   const chunks = [];
 
   recorder.ondataavailable = (e) => {
-    if (e.data.size > 0) {
-      chunks.push(e.data);
-    }
+    if (e.data.size > 0) chunks.push(e.data);
   };
 
   recorder.onstop = () => {
@@ -151,19 +72,36 @@ async function createVideoFromAudio(audioBlob) {
     a.download = 'custom_ad_break.webm';
     a.click();
 
-    progress.textContent = 'Video download complete!';
+    clearInterval(progressInterval);
+    progressBar.style.width = '100%';
     setTimeout(() => {
-      progress.textContent = '';
-    }, 3000);
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+    }, 1000);
   };
 
   recorder.start();
   audio.play();
 
+  // Set up progress bar
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
+  progressContainer.style.display = 'block';
+  progressBar.style.width = '0%';
+
+  const updateProgress = () => {
+    const percent = (audio.currentTime / audio.duration) * 100;
+    progressBar.style.width = `${percent}%`;
+  };
+
+  const progressInterval = setInterval(updateProgress, 100);
+
+  // Stop when audio ends
   audio.onended = () => {
     recorder.stop();
   };
 
+  // Fallback stop
   setTimeout(() => {
     if (recorder.state !== 'inactive') {
       recorder.stop();
