@@ -1,6 +1,4 @@
-// The main function that generates the ad break
 function createAdBreak() {
-  // Array of audio files from HTML select elements
   let audioFiles = [
     document.getElementById('station_in').value,
     document.getElementById('gap0').value,
@@ -24,14 +22,14 @@ function createAdBreak() {
   let audioContext = new AudioContext();
   let finalBuffer = null;
 
-  // Fetch and decode audio files
+  // Fetch and decode audio
   async function fetchAudio(url) {
     let response = await fetch(url);
     let arrayBuffer = await response.arrayBuffer();
     return await audioContext.decodeAudioData(arrayBuffer);
   }
 
-  // Merge all audio buffers
+  // Merge all selected audio files
   async function mergeAudio() {
     let buffers = await Promise.all(audioFiles.map(fetchAudio));
     let totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
@@ -46,7 +44,7 @@ function createAdBreak() {
     await saveAudio(finalBuffer);
   }
 
-  // Save the merged audio as either audio or video
+  // Save the audio or video
   async function saveAudio(buffer) {
     const exportType = document.getElementById('exportType').value;
     const wavBlob = bufferToWave(buffer, buffer.length);
@@ -62,7 +60,7 @@ function createAdBreak() {
     }
   }
 
-  // Convert buffer to WAV format
+  // Convert the audio buffer to a WAV file
   function bufferToWave(abuffer, len) {
     let numOfChan = abuffer.numberOfChannels,
       length = len * numOfChan * 2 + 44,
@@ -102,22 +100,18 @@ function createAdBreak() {
     return new Blob([buffer], { type: 'audio/wav' });
   }
 
-  // Write UTF-8 bytes to the view
+  // Write a string in UTF-8 format
   function writeUTFBytes(view, offset, string) {
     for (let i = 0; i < string.length; i++) {
       view.setUint8(offset + i, string.charCodeAt(i));
     }
   }
 
-  mergeAudio();  // This should be inside the main function
+  // Call mergeAudio function to process the selected files
+  mergeAudio();
 }
 
-// Handle the button click to generate the ad break
-window.handleAdBreak = function () {
-  createAdBreak();
-};
-
-// Your video creation function (untouched)
+// Moved outside main function
 async function createVideoFromAudio(audioBlob) {
   const image = new Image();
   const selectedImage = document.getElementById('coverImage').value;
@@ -157,3 +151,8 @@ async function createVideoFromAudio(audioBlob) {
 
   audio.onended = () => recorder.stop();
 }
+
+// Expose to global scope
+window.handleAdBreak = function () {
+  createAdBreak();
+};
