@@ -116,9 +116,7 @@ async function createVideoAdBreak() {
         document.getElementById('gap7').value,
         document.getElementById('station_out').value
     ];
-    
     let imageFile = document.getElementById('video_image').value;
-
     // Merge audio and then create video
     let mergedAudioBuffer = await mergeAudio(audioFiles);
     createVideo(mergedAudioBuffer, imageFile);
@@ -128,20 +126,19 @@ async function createVideo(audioBuffer, imageFile) {
     const audioBlob = bufferToWave(audioBuffer, audioBuffer.length);
     const audioURL = URL.createObjectURL(audioBlob);
     const videoStream = new MediaStream();
-
+    
     const image = new Image();
     image.src = imageFile;
     image.onload = function() {
         const canvas = document.createElement('canvas');
         canvas.width = image.width;
         canvas.height = image.height;
-        
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(image, 0, 0);
-
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        
         const videoTrack = canvas.captureStream().getVideoTracks()<source_id data="0" title="N/A" />;
         videoStream.addTrack(videoTrack);
-
+        
         const mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
         const chunks = [];
         mediaRecorder.ondataavailable = e => chunks.push(e.data);
@@ -153,6 +150,7 @@ async function createVideo(audioBuffer, imageFile) {
             a.download = 'custom_ad_break.webm';
             a.click();
         };
+        
         mediaRecorder.start();
         const audio = new Audio(audioURL);
         audio.onended = () => mediaRecorder.stop();
