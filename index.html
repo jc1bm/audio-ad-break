@@ -172,14 +172,19 @@
     <option value="audio/ad/none.wav">None</option>
   </select>
 
-  <button onclick="createAdBreak()">Generate Ad Break</button>
+  <label for="coverImage">Select Cover Image:</label>
+<select id="coverImage">
+  <option value="images/absolute.jpg">Absolute</option>
+</select>
 
   <br>
-<label for="exportFormat">Export as:</label>
-<select id="exportFormat">
-  <option value="audio">Audio (.wav)</option>
-  <option value="video">Video (.mp4)</option>
+<label for="exportType">Export as:</label>
+<select id="exportType">
+  <option value="audio">Audio</option>
+  <option value="video">Video</option>
 </select>
+
+<button onclick="handleAdBreak()">Generate Ad Break</button>
 
   <!-- ✅ Your main script -->
   <script src="script.js" defer></script>
