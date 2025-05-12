@@ -69,7 +69,7 @@ async function mergeAudio(audioFiles) {
         finalBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
         offset += buffer.length;
     });
-    return finalBuffer; // modified to return buffer
+    return finalBuffer; // modified to return buffer for video creation too
 }
 
 function createAdBreak() {
@@ -117,7 +117,7 @@ async function createVideoAdBreak() {
         document.getElementById('station_out').value
     ];
     let imageFile = document.getElementById('video_image').value;
-    // Merge audio and then create video
+    
     let mergedAudioBuffer = await mergeAudio(audioFiles);
     createVideo(mergedAudioBuffer, imageFile);
 }
