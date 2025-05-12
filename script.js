@@ -168,6 +168,7 @@ async function createVideoFromAudio(audioBlob) {
   }, 60000);
 }
 
+
 // Expose to global scope
 window.handleAdBreak = function () {
   createAdBreak();
