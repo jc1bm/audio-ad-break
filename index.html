@@ -1,244 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Ad-In-Situ Maker</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="container">
+    <h1>Ad-In-Situ Maker</h1>
 
-  <h1>Ad-In-Situ Maker</h1>
+    <div class="section">
+      <label>Station In</label>
+      <select id="station_in">
+        <option value="audio/station/absolute.wav">Absolute</option>
+        <option value="audio/station/sting2.wav">Sting 2</option>
+        <option value="audio/ad/none.wav">None</option>
+      </select>
 
-  <!-- Station In -->
-  <select id="station_in">
-    <option value="audio/station/absolute.wav">Absolute</option>
-    <option value="audio/station/sting2.wav">Sting 2</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+      <select id="gap0">
+        <option value="audio/ad/gap.wav">Gap</option>
+        <option value="audio/ad/none.wav">None</option>
+      </select>
+    </div>
 
-  <!-- Gap and Ad Selects -->
-  <select id="gap0">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+    <!-- Ad Slots -->
+    <div id="ads-container" class="section"></div>
 
-  <br />
-  <br />
+    <div class="section">
+      <label>Station Out</label>
+      <select id="station_out">
+        <option value="audio/station/absolute.wav">Absolute</option>
+        <option value="audio/station/sting2.wav">Sting 2</option>
+        <option value="audio/ad/none.wav">None</option>
+      </select>
+    </div>
 
-  <select id="ad1">
-    <option value="audio/ad/ad1.wav">Ad 1</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
+    <div class="section">
+      <label>Export Type</label>
+      <select id="exportType">
+        <option value="audio">Audio Only (WAV)</option>
+        <option value="video">Video with Image (MP4)</option>
+      </select>
+    </div>
 
-  <select id="gap1">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+    <div class="section">
+      <label>Optional Cover Image for Video</label>
+      <input type="file" id="imageInput" accept="image/*" />
+    </div>
 
-  <br />
+    <button onclick="createAdBreak()">Generate Ad Break</button>
 
-  <select id="ad2">
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad1.wav">Ad 1</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
+    <div class="links">
+      <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">Clear target audio</a>
+      <a href="https://github.com/jc1bm/audio-ad-break/upload/main/audio/ad" target="_blank">Upload target audio</a>
+    </div>
+  </div>
 
-  <select id="gap2">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.2/dist/ffmpeg.min.js"></script>
+  <script type="module" src="script.js"></script>
 
-  <br />
-
-  <select id="ad3">
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad1.wav">Ad 1</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
-
-  <select id="gap3">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-
-  <select id="ad4">
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad1.wav">Ad 1</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
-
-  <select id="gap4">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-
-  <select id="ad5">
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 1</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
-
-  <select id="gap5">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-
-  <select id="ad6">
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 1</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
-
-  <select id="gap6">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-
-  <select id="ad7">
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 1</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
-
-  <select id="gap7">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-  <br />
-
-  <!-- Station Out -->
-  <select id="station_out">
-    <option value="audio/station/absolute.wav">Absolute</option>
-    <option value="audio/station/sting2.wav">Sting 2</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <button onclick="createAdBreak()">Generate Ad Break</button>
-
-  <!-- ✅ Your main script -->
-  <script src="script.js" defer></script>
-
-  <!-- ✅ Dynamic file format detection -->
   <script>
-    async function resolveTargetFormat() {
+    const adOptions = `
+      <option value="audio/ad/ad1.wav">Ad 1</option>
+      <option value="audio/ad/ad2.wav">Ad 2</option>
+      <option value="audio/ad/ad3.wav">Ad 3</option>
+      <option value="audio/ad/ad4.wav">Ad 4</option>
+      <option value="audio/ad/ad5.wav">Ad 5</option>
+      <option value="audio/ad/ad6.wav">Ad 6</option>
+      <option value="audio/ad/ad7.wav">Ad 7</option>
+      <option value="audio/ad/ad8.wav">Ad 8</option>
+      <option value="audio/ad/none.wav">None</option>
+      <option value="audio/ad/target.wav">Target Wav</option>
+    `;
+
+    const adsContainer = document.getElementById('ads-container');
+    for (let i = 1; i <= 7; i++) {
+      adsContainer.innerHTML += `
+        <div class="ad-block">
+          <select id="ad${i}">${adOptions}</select>
+          <select id="gap${i}">
+            <option value="audio/ad/gap.wav">Gap</option>
+            <option value="audio/ad/none.wav">None</option>
+          </select>
+        </div>
+      `;
+    }
+
+    // Dynamic format resolution
+    window.addEventListener('DOMContentLoaded', async () => {
       const basePath = 'audio/ad/target';
       const formats = ['.wav', '.mp3'];
-      let found = false;
-
       for (const ext of formats) {
-        const url = basePath + ext;
         try {
-          const res = await fetch(url, { method: 'HEAD' });
+          const res = await fetch(basePath + ext, { method: 'HEAD' });
           if (res.ok) {
-            updateTargetOption(ext);
-            found = true;
-            break;
+            document.querySelectorAll('select').forEach(select =>
+              [...select.options].forEach(option => {
+                if (option.value.includes('target')) {
+                  option.value = basePath + ext;
+                }
+              })
+            );
+            return;
           }
-        } catch (e) {
-          console.warn(`Could not load ${url}`);
-        }
+        } catch {}
       }
 
-      if (!found) {
-        removeTargetOptions();
-      }
-    }
-
-    function updateTargetOption(ext) {
-      const selects = document.querySelectorAll('select');
-      selects.forEach(select => {
-        [...select.options].forEach(option => {
-          if (option.value.includes('audio/ad/target')) {
-            option.value = `audio/ad/target${ext}`;
-          }
-        });
-      });
-    }
-
-    function removeTargetOptions() {
-      const selects = document.querySelectorAll('select');
-      selects.forEach(select => {
+      // Remove target options if no file found
+      document.querySelectorAll('select').forEach(select =>
         [...select.options].forEach((option, i) => {
-          if (option.value === 'audio/ad/target.wav' || option.value === 'audio/ad/target.mp3') {
-            select.remove(i);
-          }
-        });
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', resolveTargetFormat);
+          if (option.value.includes('target')) select.remove(i);
+        })
+      );
+    });
   </script>
-
-  <br /><br />
-
-  <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">
-    Clear target audio
-  </a>
-
-  <br /><br />
-
-  <a href="https://github.com/jc1bm/audio-ad-break/upload/main/audio/ad" target="_blank">
-    Upload target audio
-  </a>
-
 </body>
 </html>
