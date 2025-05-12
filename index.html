@@ -10,17 +10,20 @@
     <h1>Ad-In-Situ Maker</h1>
 
     <div class="section">
-      <label>Station In</label>
-      <select id="station_in">
-        <option value="audio/station/absolute.wav">Absolute</option>
-        <option value="audio/station/sting2.wav">Sting 2</option>
-        <option value="audio/ad/none.wav">None</option>
-      </select>
+      <div class="dropdown-container">
+        <label>Station In</label>
+        <select id="station_in">
+          <option value="audio/station/absolute.wav">Absolute</option>
+          <option value="audio/station/sting2.wav">Sting 2</option>
+          <option value="audio/ad/none.wav">None</option>
+        </select>
 
-      <select id="gap0">
-        <option value="audio/ad/gap.wav">Gap</option>
-        <option value="audio/ad/none.wav">None</option>
-      </select>
+        <label>Gap</label>
+        <select id="gap0">
+          <option value="audio/ad/gap.wav">Gap</option>
+          <option value="audio/ad/none.wav">None</option>
+        </select>
+      </div>
     </div>
 
     <!-- Ad Slots -->
@@ -44,11 +47,24 @@
     </div>
 
     <div class="section">
+      <label for="coverImage">Select Cover Image:</label>
+      <select id="coverImage">
+        <option value="images/absolute.jpg">Absolute</option>
+        <option value="images/example.jpg">Example</option>
+      </select>
+    </div>
+
+    <div class="section">
       <label>Optional Cover Image for Video</label>
       <input type="file" id="imageInput" accept="image/*" />
     </div>
 
     <button onclick="createAdBreak()">Generate Ad Break</button>
+
+    <div id="progress-container">
+      <label for="progress">Processing:</label>
+      <progress id="progress" value="0" max="100"></progress>
+    </div>
 
     <div class="links">
       <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">Clear target audio</a>
@@ -85,34 +101,6 @@
         </div>
       `;
     }
-
-    // Dynamic format resolution
-    window.addEventListener('DOMContentLoaded', async () => {
-      const basePath = 'audio/ad/target';
-      const formats = ['.wav', '.mp3'];
-      for (const ext of formats) {
-        try {
-          const res = await fetch(basePath + ext, { method: 'HEAD' });
-          if (res.ok) {
-            document.querySelectorAll('select').forEach(select =>
-              [...select.options].forEach(option => {
-                if (option.value.includes('target')) {
-                  option.value = basePath + ext;
-                }
-              })
-            );
-            return;
-          }
-        } catch {}
-      }
-
-      // Remove target options if no file found
-      document.querySelectorAll('select').forEach(select =>
-        [...select.options].forEach((option, i) => {
-          if (option.value.includes('target')) select.remove(i);
-        })
-      );
-    });
   </script>
 </body>
 </html>
