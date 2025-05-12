@@ -56,8 +56,9 @@ async function saveAudio(buffer) {
     await createVideoFromAudio(wavBlob);
 async function createVideoFromAudio(audioBlob) {
   const image = new Image();
-  image.src = 'images/thumbnail.jpg'; // your still image path
-  await image.decode();
+const selectedImage = document.getElementById('coverImage').value;
+image.src = selectedImage;
+    await image.decode();
 
   const canvas = document.createElement('canvas');
   canvas.width = 1280;
