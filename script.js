@@ -1,4 +1,6 @@
+// The main function that generates the ad break
 function createAdBreak() {
+  // Array of audio files from HTML select elements
   let audioFiles = [
     document.getElementById('station_in').value,
     document.getElementById('gap0').value,
@@ -22,12 +24,14 @@ function createAdBreak() {
   let audioContext = new AudioContext();
   let finalBuffer = null;
 
+  // Fetch and decode audio files
   async function fetchAudio(url) {
     let response = await fetch(url);
     let arrayBuffer = await response.arrayBuffer();
     return await audioContext.decodeAudioData(arrayBuffer);
   }
 
+  // Merge all audio buffers
   async function mergeAudio() {
     let buffers = await Promise.all(audioFiles.map(fetchAudio));
     let totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
@@ -42,6 +46,7 @@ function createAdBreak() {
     await saveAudio(finalBuffer);
   }
 
+  // Save the merged audio as either audio or video
   async function saveAudio(buffer) {
     const exportType = document.getElementById('exportType').value;
     const wavBlob = bufferToWave(buffer, buffer.length);
@@ -57,6 +62,7 @@ function createAdBreak() {
     }
   }
 
+  // Convert buffer to WAV format
   function bufferToWave(abuffer, len) {
     let numOfChan = abuffer.numberOfChannels,
       length = len * numOfChan * 2 + 44,
@@ -96,15 +102,22 @@ function createAdBreak() {
     return new Blob([buffer], { type: 'audio/wav' });
   }
 
+  // Write UTF-8 bytes to the view
   function writeUTFBytes(view, offset, string) {
     for (let i = 0; i < string.length; i++) {
       view.setUint8(offset + i, string.charCodeAt(i));
     }
   }
 
-  mergeAudio();
+  mergeAudio();  // This should be inside the main function
+}
 
-// Moved outside main function
+// Handle the button click to generate the ad break
+window.handleAdBreak = function () {
+  createAdBreak();
+};
+
+// Your video creation function (untouched)
 async function createVideoFromAudio(audioBlob) {
   const image = new Image();
   const selectedImage = document.getElementById('coverImage').value;
@@ -144,8 +157,3 @@ async function createVideoFromAudio(audioBlob) {
 
   audio.onended = () => recorder.stop();
 }
-
-// Expose to global scope
-window.handleAdBreak = function () {
-  createAdBreak();
-};
