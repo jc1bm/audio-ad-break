@@ -14,8 +14,8 @@
     <option value="audio/ad/none.wav">None</option>
   </select>
 
-  <!-- All ad/gap selects -->
-  <!-- You can paste your long list of ad/gap selects here exactly as you have it -->
+  <!-- Gaps and Ads -->
+  <!-- ... keep your full select structure here (unchanged) ... -->
 
   <!-- Station Out -->
   <br /><br />
@@ -33,20 +33,16 @@
   </select>
 
   <br /><br />
+
   <button onclick="createAdBreak()">Generate Ad Break</button>
 
-  <!-- FFmpeg.wasm module loader via ES Module (GitHub Pages friendly) -->
-  <script type="module">
-    import { createFFmpeg, fetchFile } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.2/dist/ffmpeg.min.js';
+  <!-- FFmpeg.wasm -->
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.2/dist/ffmpeg.min.js"></script>
 
-    window.ffmpeg = createFFmpeg({ log: true });
-    window.fetchFile = fetchFile;
-  </script>
-
-  <!-- Your main script -->
+  <!-- Main script logic -->
   <script src="script.js" defer></script>
 
-  <!-- Dynamic format detection for target.mp3/.wav -->
+  <!-- Dynamic format detection -->
   <script>
     async function resolveTargetFormat() {
       const basePath = 'audio/ad/target';
@@ -97,7 +93,7 @@
     window.addEventListener('DOMContentLoaded', resolveTargetFormat);
   </script>
 
-  <!-- Upload/clear target audio links -->
+  <!-- Upload/clear links -->
   <br /><br />
   <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">Clear target audio</a>
   <br /><br />
