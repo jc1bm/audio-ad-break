@@ -52,7 +52,7 @@ async function saveAudio(buffer) {
     const wavFile = new File([wavBlob], 'input.wav');
 
     // Fetch image from public /images folder
-    const imageUrl = 'images/logo.jpg'; // update path if needed
+    const imageUrl = document.getElementById('imageSelector').value;
     const imageResponse = await fetch(imageUrl);
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageUint8Array = new Uint8Array(imageArrayBuffer);
