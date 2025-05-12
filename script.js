@@ -41,33 +41,44 @@ function createAdBreak() {
 
         saveAudio(finalBuffer);
     }
-
 async function saveAudio(buffer) {
     const { createFFmpeg, fetchFile } = FFmpeg;
     const ffmpeg = createFFmpeg({ log: true });
 
     await ffmpeg.load();
 
+    // Convert buffer to WAV Blob
     const wavBlob = bufferToWave(buffer, buffer.length);
     const wavFile = new File([wavBlob], 'input.wav');
 
-    // Write input file to FFmpeg FS
-    ffmpeg.FS('writeFile', 'input.wav', await fetchFile(wavFile));
+    // Fetch image from public /images folder
+    const imageUrl = 'images/logo.jpg'; // update path if needed
+    const imageResponse = await fetch(imageUrl);
+    const imageArrayBuffer = await imageResponse.arrayBuffer();
+    const imageUint8Array = new Uint8Array(imageArrayBuffer);
 
-    // Convert WAV to MP4 (silent video with audio track)
+    // Load files into FFmpeg FS
+    ffmpeg.FS('writeFile', 'input.wav', await fetchFile(wavFile));
+    ffmpeg.FS('writeFile', 'image.jpg', imageUint8Array);
+
+    // Combine into video with still image
     await ffmpeg.run(
-        '-i', 'input.wav',
-        '-f', 'mp4',
-        '-c:a', 'aac',
+        '-loop', '1',           // Loop the image
+        '-i', 'image.jpg',      // Image input
+        '-i', 'input.wav',      // Audio input
+        '-c:v', 'libx264',      // Video codec
+        '-tune', 'stillimage',  // Optimize for still image
+        '-c:a', 'aac',          // Audio codec
         '-b:a', '192k',
-        '-vn', // no video
+        '-shortest',            // Match video length to audio
+        '-pix_fmt', 'yuv420p',  // Ensures compatibility
         'output.mp4'
     );
 
-    // Read back the result
+    // Read and export the result
     const data = ffmpeg.FS('readFile', 'output.mp4');
-    const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
-    const url = URL.createObjectURL(mp4Blob);
+    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(videoBlob);
 
     const a = document.createElement('a');
     a.href = url;
