@@ -12,6 +12,8 @@ async function createAdBreak() {
     document.getElementById('gap0').value,
     document.getElementById('ad1').value,
     document.getElementById('gap1').value,
+
+    
     document.getElementById('ad2').value,
     document.getElementById('gap2').value,
     document.getElementById('ad3').value,
@@ -94,4 +96,6 @@ function downloadFile(data, filename, mimeType) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+
+ window.createAdBreak = createAdBreak;
 }
