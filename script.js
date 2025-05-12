@@ -22,14 +22,12 @@ function createAdBreak() {
   let audioContext = new AudioContext();
   let finalBuffer = null;
 
-  // Fetch and decode audio
   async function fetchAudio(url) {
     let response = await fetch(url);
     let arrayBuffer = await response.arrayBuffer();
     return await audioContext.decodeAudioData(arrayBuffer);
   }
 
-  // Merge all selected audio files
   async function mergeAudio() {
     let buffers = await Promise.all(audioFiles.map(fetchAudio));
     let totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
@@ -44,7 +42,6 @@ function createAdBreak() {
     await saveAudio(finalBuffer);
   }
 
-  // Save the audio or video
   async function saveAudio(buffer) {
     const exportType = document.getElementById('exportType').value;
     const wavBlob = bufferToWave(buffer, buffer.length);
@@ -60,16 +57,15 @@ function createAdBreak() {
     }
   }
 
-  // Convert the audio buffer to a WAV file
   function bufferToWave(abuffer, len) {
     let numOfChan = abuffer.numberOfChannels,
-      length = len * numOfChan * 2 + 44,
-      buffer = new ArrayBuffer(length),
-      view = new DataView(buffer),
-      channels = [],
-      sampleRate = abuffer.sampleRate,
-      offset = 44,
-      pos = 0;
+        length = len * numOfChan * 2 + 44,
+        buffer = new ArrayBuffer(length),
+        view = new DataView(buffer),
+        channels = [],
+        sampleRate = abuffer.sampleRate,
+        offset = 44,
+        pos = 0;
 
     writeUTFBytes(view, 0, 'RIFF');
     view.setUint32(4, length - 8, true);
@@ -100,7 +96,6 @@ function createAdBreak() {
     return new Blob([buffer], { type: 'audio/wav' });
   }
 
-  // Write a string in UTF-8 format
   function writeUTFBytes(view, offset, string) {
     for (let i = 0; i < string.length; i++) {
       view.setUint8(offset + i, string.charCodeAt(i));
@@ -111,7 +106,6 @@ function createAdBreak() {
   mergeAudio();
 }
 
-// Moved outside main function
 async function createVideoFromAudio(audioBlob) {
   const image = new Image();
   const selectedImage = document.getElementById('coverImage').value;
