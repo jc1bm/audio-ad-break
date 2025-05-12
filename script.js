@@ -105,6 +105,7 @@ function createAdBreak() {
   mergeAudio();
 }
 
+// Moved outside main function
 async function createVideoFromAudio(audioBlob) {
   const image = new Image();
   const selectedImage = document.getElementById('coverImage').value;
@@ -145,7 +146,7 @@ async function createVideoFromAudio(audioBlob) {
   audio.onended = () => recorder.stop();
 }
 
-// Connect to button
-function handleAdBreak() {
+// Expose to global scope
+window.handleAdBreak = function () {
   createAdBreak();
-}
+};
