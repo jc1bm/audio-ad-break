@@ -103,7 +103,6 @@ function createAdBreak() {
   }
 
   mergeAudio();
-}
 
 // Moved outside main function
 async function createVideoFromAudio(audioBlob) {
