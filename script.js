@@ -118,19 +118,31 @@ async function createVideoFromAudio(audioBlob) {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-  const stream = canvas.captureStream(30);
-  const audio = new Audio(URL.createObjectURL(audioBlob));
+  const stream = canvas.captureStream(30); // 30 FPS
+
+  // Set up audio
   const audioContext = new AudioContext();
+  await audioContext.resume(); // Important on some browsers
+
+  const audio = new Audio(URL.createObjectURL(audioBlob));
   const source = audioContext.createMediaElementSource(audio);
   const dest = audioContext.createMediaStreamDestination();
   source.connect(dest);
   source.connect(audioContext.destination);
+
+  // Add audio track to stream
   stream.addTrack(dest.stream.getAudioTracks()[0]);
 
+  // Record the combined stream
   const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
   const chunks = [];
 
-  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.ondataavailable = (e) => {
+    if (e.data.size > 0) {
+      chunks.push(e.data);
+    }
+  };
+
   recorder.onstop = () => {
     const videoBlob = new Blob(chunks, { type: 'video/webm' });
     const url = URL.createObjectURL(videoBlob);
@@ -143,7 +155,17 @@ async function createVideoFromAudio(audioBlob) {
   recorder.start();
   audio.play();
 
-  audio.onended = () => recorder.stop();
+  // Stop recording after audio ends
+  audio.onended = () => {
+    recorder.stop();
+  };
+
+  // Fallback: Stop after max 60 seconds if onended fails
+  setTimeout(() => {
+    if (recorder.state !== 'inactive') {
+      recorder.stop();
+    }
+  }, 60000);
 }
 
 // Expose to global scope
