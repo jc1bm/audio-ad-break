@@ -6,7 +6,7 @@
 </head>
 <body>
 
-  <h1>Audio Ad Break</h1>
+  <h1>Ad-In-Situ Maker</h1>
 
   <!-- Station In -->
   <select id="station_in">
@@ -17,7 +17,7 @@
 
   <!-- Gap and Ad Selects -->
   <select id="gap0">
-    <option value="audio/ad/gap.mp3">Gap</option>
+    <option value="audio/ad/gap.wav">Gap</option>
     <option value="audio/ad/none.wav">None</option>
   </select>
 
@@ -34,11 +34,11 @@
     <option value="audio/ad/ad7.wav">Ad 7</option>
     <option value="audio/ad/ad8.wav">Ad 8</option>
     <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target</option>
+    <option value="audio/ad/target.wav">Target Wav</option>
   </select>
 
   <select id="gap1">
-    <option value="audio/ad/gap.mp3">Gap</option>
+    <option value="audio/ad/gap.wav">Gap</option>
     <option value="audio/ad/none.wav">None</option>
   </select>
 
@@ -54,11 +54,11 @@
     <option value="audio/ad/ad7.wav">Ad 7</option>
     <option value="audio/ad/ad8.wav">Ad 8</option>
     <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target</option>
+    <option value="audio/ad/target.wav">Target Wav</option>
   </select>
 
   <select id="gap2">
-    <option value="audio/ad/gap.mp3">Gap</option>
+    <option value="audio/ad/gap.wav">Gap</option>
     <option value="audio/ad/none.wav">None</option>
   </select>
 
@@ -74,11 +74,11 @@
     <option value="audio/ad/ad7.wav">Ad 7</option>
     <option value="audio/ad/ad8.wav">Ad 8</option>
     <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target</option>
+    <option value="audio/ad/target.wav">Target Wav</option>
   </select>
 
   <select id="gap3">
-    <option value="audio/ad/gap.mp3">Gap</option>
+    <option value="audio/ad/gap.wav">Gap</option>
     <option value="audio/ad/none.wav">None</option>
   </select>
 
@@ -94,11 +94,11 @@
     <option value="audio/ad/ad7.wav">Ad 7</option>
     <option value="audio/ad/ad8.wav">Ad 8</option>
     <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target</option>
+    <option value="audio/ad/target.wav">Target Wav</option>
   </select>
 
   <select id="gap4">
-    <option value="audio/ad/gap.mp3">Gap</option>
+    <option value="audio/ad/gap.wav">Gap</option>
     <option value="audio/ad/none.wav">None</option>
   </select>
 
@@ -114,11 +114,11 @@
     <option value="audio/ad/ad7.wav">Ad 7</option>
     <option value="audio/ad/ad8.wav">Ad 8</option>
     <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target</option>
+    <option value="audio/ad/target.wav">Target Wav</option>
   </select>
 
   <select id="gap5">
-    <option value="audio/ad/gap.mp3">Gap</option>
+    <option value="audio/ad/gap.wav">Gap</option>
     <option value="audio/ad/none.wav">None</option>
   </select>
 
@@ -134,11 +134,11 @@
     <option value="audio/ad/ad7.wav">Ad 7</option>
     <option value="audio/ad/ad8.wav">Ad 8</option>
     <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target</option>
+    <option value="audio/ad/target.wav">Target Wav</option>
   </select>
 
   <select id="gap6">
-    <option value="audio/ad/gap.mp3">Gap</option>
+    <option value="audio/ad/gap.wav">Gap</option>
     <option value="audio/ad/none.wav">None</option>
   </select>
 
@@ -154,11 +154,11 @@
     <option value="audio/ad/ad7.wav">Ad 1</option>
     <option value="audio/ad/ad8.wav">Ad 8</option>
     <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target</option>
+    <option value="audio/ad/target.wav">Target Wav</option>
   </select>
 
   <select id="gap7">
-    <option value="audio/ad/gap.mp3">Gap</option>
+    <option value="audio/ad/gap.wav">Gap</option>
     <option value="audio/ad/none.wav">None</option>
   </select>
 
@@ -194,7 +194,7 @@
             break;
           }
         } catch (e) {
-          console.warn(`Could not load ${url}`);
+          console.warn(Could not load ${url});
         }
       }
 
@@ -208,7 +208,7 @@
       selects.forEach(select => {
         [...select.options].forEach(option => {
           if (option.value.includes('audio/ad/target')) {
-            option.value = `audio/ad/target${ext}`;
+            option.value = audio/ad/target${ext};
           }
         });
       });
