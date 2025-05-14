@@ -1,101 +1,115 @@
-import { createFFmpeg, fetchFile } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.2/dist/esm/ffmpeg.mjs';
-
-const ffmpeg = createFFmpeg({ log: true });
-
 async function createAdBreak() {
-  if (!ffmpeg.isLoaded()) {
-    await ffmpeg.load();
-  }
-
-  const clips = [
-    document.getElementById('station_in').value,
-    document.getElementById('gap0').value,
-    document.getElementById('ad1').value,
-    document.getElementById('gap1').value,
-
+    const audioFiles = Array.from(document.getElementById('audioFiles').files);
+    const imageFile = document.getElementById('image').files<source_id data="0" title="N/A" />;
+    const exportAsVideo = document.getElementById('exportAsVideo').checked;
     
-    document.getElementById('ad2').value,
-    document.getElementById('gap2').value,
-    document.getElementById('ad3').value,
-    document.getElementById('gap3').value,
-    document.getElementById('ad4').value,
-    document.getElementById('gap4').value,
-    document.getElementById('ad5').value,
-    document.getElementById('gap5').value,
-    document.getElementById('ad6').value,
-    document.getElementById('gap6').value,
-    document.getElementById('ad7').value,
-    document.getElementById('gap7').value,
-    document.getElementById('station_out').value,
-  ].filter(src => !src.includes('none.wav'));
+    const audioContext = new AudioContext();
+    
+    async function fetchAndDecode(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        return await audioContext.decodeAudioData(arrayBuffer);
+    }
+    
+    const audioBuffers = await Promise.all(audioFiles.map(fetchAndDecode));
+    const totalLength = audioBuffers.reduce((sum, b) => sum + b.length, 0);
+    const outputBuffer = audioContext.createBuffer(1, totalLength, audioContext.sampleRate);
+    
+    let offset = 0;
+    audioBuffers.forEach(buffer => {
+        outputBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
+        offset += buffer.length;
+    });
 
-  const exportType = document.getElementById('exportType').value;
-  const imageFile = document.getElementById('imageInput')?.files?.[0];
+    if (exportAsVideo && imageFile) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = URL.createObjectURL(imageFile);
+        
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            const source = audioContext.createBufferSource();
+            source.buffer = outputBuffer;
+            
+            const dest = audioContext.createMediaStreamDestination();
+            source.connect(dest);
+            
+            const canvasStream = canvas.captureStream();
+            const combinedStream = new MediaStream([
+                ...canvasStream.getVideoTracks(),
+                ...dest.stream.getAudioTracks()
+            ]);
+            
+            const recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+            const chunks = [];
+            
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ad-break.webm';
+                a.click();
+            };
 
-  const listFile = 'input.txt';
-  const concatList = [];
+            recorder.start();
+            source.start();
 
-  // Load all audio files into ffmpeg FS
-  for (let i = 0; i < clips.length; i++) {
-    const name = `clip${i}.wav`;
-    const data = await fetchFile(clips[i]);
-    ffmpeg.FS('writeFile', name, data);
-    concatList.push(`file '${name}'`);
-  }
-
-  // Write the concat list file
-  ffmpeg.FS('writeFile', listFile, concatList.join('\n'));
-
-  // Merge audio clips
-  await ffmpeg.run('-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', 'output.wav');
-
-  // Export logic
-  if (exportType === 'audio') {
-    const output = ffmpeg.FS('readFile', 'output.wav');
-    downloadFile(output, 'ad-break.wav', 'audio/wav');
-  } else if (exportType === 'video' && imageFile) {
-    const imageName = 'cover.jpg';
-    ffmpeg.FS('writeFile', imageName, await fetchFile(imageFile));
-
-    // Create a video with the still image and merged audio
-    await ffmpeg.run(
-      '-loop', '1',
-      '-i', imageName,
-      '-i', 'output.wav',
-      '-shortest',
-      '-c:v', 'libx264',
-      '-c:a', 'aac',
-      '-b:a', '192k',
-      '-pix_fmt', 'yuv420p',
-      'output.mp4'
-    );
-
-    const output = ffmpeg.FS('readFile', 'output.mp4');
-    downloadFile(output, 'ad-break.mp4', 'video/mp4');
-  } else {
-    alert('Please select an image if exporting video.');
-  }
-
-  // Cleanup
-  ffmpeg.FS('unlink', listFile);
-  clips.forEach((_, i) => ffmpeg.FS('unlink', `clip${i}.wav`));
-  if (exportType === 'video') {
-    ffmpeg.FS('unlink', 'output.wav');
-    ffmpeg.FS('unlink', 'cover.jpg');
-    ffmpeg.FS('unlink', 'output.mp4');
-  } else {
-    ffmpeg.FS('unlink', 'output.wav');
-  }
+            setTimeout(() => recorder.stop(), outputBuffer.duration * 1000);
+        };
+    } else {
+        const wavBlob = bufferToWave(outputBuffer, outputBuffer.length);
+        const url = URL.createObjectURL(wavBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ad-break.wav';
+        a.click();
+    }
 }
 
-function downloadFile(data, filename, mimeType) {
-  const blob = new Blob([data.buffer], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
+function bufferToWave(abuffer, len) {
+    const numOfChan = abuffer.numberOfChannels,
+          length = len * numOfChan * 2 + 44,
+          buffer = new ArrayBuffer(length),
+          view = new DataView(buffer),
+          channels = [],
+          sampleRate = abuffer.sampleRate,
+          offset = 44;
 
- window.createAdBreak = createAdBreak;
+    writeUTFBytes(view, 0, 'RIFF');
+    view.setUint32(4, length - 8, true);
+    writeUTFBytes(view, 8, 'WAVE');
+    writeUTFBytes(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numOfChan, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2 * numOfChan, true);
+    view.setUint16(32, numOfChan * 2, true);
+    view.setUint16(34, 16, true);
+    writeUTFBytes(view, 36, 'data');
+    view.setUint32(40, length - 44, true);
+
+    for (let i = 0; i < numOfChan; i++) {
+        channels.push(abuffer.getChannelData(i));
+    }
+    
+    let pos = 0;
+    while (pos < len) {
+        for (let i = 0; i < numOfChan; i++) {
+            view.setInt16(offset, channels[i][pos] * 0x7FFF, true);
+            offset += 2;
+        }
+        pos++;
+    }
+
+    return new Blob([buffer], { type: 'audio/wav' });
+}
+
+function writeUTFBytes(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
 }
