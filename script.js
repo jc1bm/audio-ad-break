@@ -1,151 +1,128 @@
 async function createAdBreak() {
-    let audioFiles = [
-        document.getElementById('station_in').value,
-        document.getElementById('gap0').value,
-        document.getElementById('ad1').value,
-        document.getElementById('gap1').value,
-        document.getElementById('ad2').value,
-        document.getElementById('gap2').value,
-        document.getElementById('ad3').value,
-        document.getElementById('gap3').value,
-        document.getElementById('ad4').value,
-        document.getElementById('gap4').value,
-        document.getElementById('ad5').value,
-        document.getElementById('gap5').value,
-        document.getElementById('ad6').value,
-        document.getElementById('gap6').value,
-        document.getElementById('ad7').value,
-        document.getElementById('gap7').value,
-        document.getElementById('station_out').value
-    ];
+  const files = [
+    document.getElementById('station').value,
+    document.getElementById('ad1').value,
+    document.getElementById('ad2').value,
+    document.getElementById('ad3').value
+  ];
+  const imagePath = document.getElementById('image').value;
+  const exportAsVideo = document.getElementById('exportAsVideo').checked;
 
-    let audioContext = new AudioContext();
-    let finalBuffer = null;
+  const audioCtx = new AudioContext();
 
-    async function fetchAudio(url) {
-        let response = await fetch(url);
-        let arrayBuffer = await response.arrayBuffer();
-        return await audioContext.decodeAudioData(arrayBuffer);
-    }
+  async function fetchAndDecode(url) {
+    const res = await fetch(url);
+    const arrayBuffer = await res.arrayBuffer();
+    return await audioCtx.decodeAudioData(arrayBuffer);
+  }
 
-    async function mergeAudio() {
-        let buffers = await Promise.all(audioFiles.map(fetchAudio));
-        let totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
-        finalBuffer = audioContext.createBuffer(1, totalLength, audioContext.sampleRate);
+  const audioBuffers = await Promise.all(files.map(fetchAndDecode));
+  const totalLength = audioBuffers.reduce((sum, b) => sum + b.length, 0);
+  const outputBuffer = audioCtx.createBuffer(1, totalLength, audioCtx.sampleRate);
 
-        let offset = 0;
-        buffers.forEach(buffer => {
-            finalBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
-            offset += buffer.length;
-        });
+  let offset = 0;
+  audioBuffers.forEach(buffer => {
+    outputBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
+    offset += buffer.length;
+  });
 
-        saveAudio(finalBuffer);
-    }
+  if (!exportAsVideo) {
+    // ✅ Export as .wav
+    const wavBlob = bufferToWave(outputBuffer, outputBuffer.length);
+    const url = URL.createObjectURL(wavBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ad-break.wav';
+    a.click();
+    return;
+  }
 
-    async function saveAudio(buffer) {
-        let wavBlob = bufferToWave(buffer, buffer.length);
-        let url = URL.createObjectURL(wavBlob);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = 'custom_ad_break.wav';
-        a.click();
-    }
+  // ✅ Export as .webm (video)
+  const source = audioCtx.createBufferSource();
+  source.buffer = outputBuffer;
 
-    function bufferToWave(abuffer, len) {
-        let numOfChan = abuffer.numberOfChannels,
-            length = len * numOfChan * 2 + 44,
-            buffer = new ArrayBuffer(length),
-            view = new DataView(buffer),
-            channels = [],
-            sampleRate = abuffer.sampleRate,
-            offset = 44,
-            pos = 0;
-            
-        writeUTFBytes(view, 0, 'RIFF');
-        view.setUint32(4, length - 8, true);
-        writeUTFBytes(view, 8, 'WAVE');
-        writeUTFBytes(view, 12, 'fmt ');
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);
-        view.setUint16(22, numOfChan, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * 2 * numOfChan, true);
-        view.setUint16(32, numOfChan * 2, true);
-        view.setUint16(34, 16, true);
-        writeUTFBytes(view, 36, 'data');
-        view.setUint32(40, length - 44, true);
+  const dest = audioCtx.createMediaStreamDestination();
+  source.connect(dest);
 
-        for (let i = 0; i < numOfChan; i++) {
-            channels.push(abuffer.getChannelData(i));
-        }
+  const canvas = document.getElementById('videoCanvas');
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.src = imagePath;
 
-        while (pos < len) {
-            for (let i = 0; i < numOfChan; i++) {
-                view.setInt16(offset, channels[i][pos] * 0x7FFF, true);
-                offset += 2;
-            }
-            pos++;
-        }
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        return new Blob([buffer], { type: 'audio/wav' });
-    }
+    const canvasStream = canvas.captureStream();
+    const combinedStream = new MediaStream([
+      ...canvasStream.getVideoTracks(),
+      ...dest.stream.getAudioTracks()
+    ]);
 
-    function writeUTFBytes(view, offset, string) {
-        for (let i = 0; i < string.length; i++) {
-            view.setUint8(offset + i, string.charCodeAt(i));
-        }
-    }
+    const recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+    const chunks = [];
 
-    mergeAudio();
-}
-
-async function createVideo() {
-    const imageFilePath = document.getElementById('image_selector').value;
-    const audioBuffer = finalBuffer; // Assuming finalBuffer holds the merged audio
-
-    let audioContext = new AudioContext();
-    let audioSource = audioContext.createBufferSource();
-    audioSource.buffer = audioBuffer;
-
-    let canvas = document.createElement('canvas');
-    canvas.width = 720; // Standard mobile resolution
-    canvas.height = 1280;
-    let ctx = canvas.getContext('2d');
-
-    let image = new Image();
-    image.src = imageFilePath;
-
-    image.onload = function() {
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-        let stream = canvas.captureStream();
-        let mediaRecorder = new MediaRecorder(stream, {
-            mimeType: 'video/webm',
-        });
-
-        let videoChunks = [];
-        mediaRecorder.ondataavailable = function(event) {
-            videoChunks.push(event.data);
-        };
-
-        mediaRecorder.onstop = function() {
-            let blob = new Blob(videoChunks, { type: 'video/webm' });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'audio_video.webm';
-            a.click();
-        };
-
-        let audioDestination = audioContext.createMediaStreamDestination();
-        audioSource.connect(audioDestination);
-        stream.addTrack(audioDestination.stream.getAudioTracks()<source_id data="0" title="N/A" />);
-
-        audioSource.start(0);
-        mediaRecorder.start();
-
-        setTimeout(() => {
-            mediaRecorder.stop();
-        }, audioBuffer.duration * 1000);
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ad-break.webm';
+      a.click();
     };
+
+    recorder.start();
+    source.start();
+
+    const duration = outputBuffer.duration * 1000;
+    setTimeout(() => recorder.stop(), duration);
+  };
+
+  // Helper to convert buffer to WAV
+  function bufferToWave(abuffer, len) {
+    const numOfChan = abuffer.numberOfChannels,
+          length = len * numOfChan * 2 + 44,
+          buffer = new ArrayBuffer(length),
+          view = new DataView(buffer),
+          channels = [],
+          sampleRate = abuffer.sampleRate,
+          offset = 44;
+
+    // Write WAV header
+    writeUTFBytes(view, 0, 'RIFF');
+    view.setUint32(4, length - 8, true);
+    writeUTFBytes(view, 8, 'WAVE');
+    writeUTFBytes(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numOfChan, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2 * numOfChan, true);
+    view.setUint16(32, numOfChan * 2, true);
+    view.setUint16(34, 16, true);
+    writeUTFBytes(view, 36, 'data');
+    view.setUint32(40, length - 44, true);
+
+    for (let i = 0; i < numOfChan; i++) {
+      channels.push(abuffer.getChannelData(i));
+    }
+
+    let pos = 0;
+    while (pos < len) {
+      for (let i = 0; i < numOfChan; i++) {
+        let sample = Math.max(-1, Math.min(1, channels[i][pos]));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+        offset += 2;
+      }
+      pos++;
+    }
+
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
+  function writeUTFBytes(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  }
 }
