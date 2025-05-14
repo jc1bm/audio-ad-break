@@ -3,57 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Ad-In-Situ Maker</title>
-    <!-- Link to CSS for styling (if you have a stylesheet) -->
-    <!-- <link rel="stylesheet" href="styles.css"> -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-
-        select {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        a {
-            display: block;
-            text-align: center;
-            color: #007bff;
-            margin: 10px 0;
-        }
-
-        a:hover {
-            text-decoration: none;
-            color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Ad-In-Situ Maker</h1>
@@ -194,73 +144,18 @@
         <option value="audio/station/sting2.wav">Sting 2</option>
         <option value="audio/ad/none.wav">None</option>
     </select>
-    <!-- Image Selector for Video Export -->
+    <!-- Image Selector for Video -->
     <select id="image_selector">
         <option value="images/img1.jpg">Image 1</option>
         <option value="images/img2.jpg">Image 2</option>
         <option value="images/img3.jpg">Image 3</option>
-        <!-- Add more images as needed -->
     </select>
     <button onclick="createAdBreak()">Generate Audio Break</button>
     <button onclick="createVideo()">Generate Video Break</button>
-
-    <!-- Main script with defer -->
     <script src="script.js" defer></script>
-
-    <script>
-        async function resolveTargetFormat() {
-            const basePath = 'audio/ad/target';
-            const formats = ['.wav', '.mp3'];
-            let found = false;
-            for (const ext of formats) {
-                const url = `${basePath}${ext}`;
-                try {
-                    const res = await fetch(url, { method: 'HEAD' });
-                    if (res.ok) {
-                        updateTargetOption(ext);
-                        found = true;
-                        break;
-                    }
-                } catch (e) {
-                    console.warn(`Could not load ${url}`);
-                }
-            }
-            if (!found) {
-                removeTargetOptions();
-            }
-        }
-
-        function updateTargetOption(ext) {
-            const selects = document.querySelectorAll('select');
-            selects.forEach(select => {
-                [...select.options].forEach(option => {
-                    if (option.value.includes('audio/ad/target')) {
-                        option.value = `audio/ad/target${ext}`;
-                    }
-                });
-            });
-        }
-
-        function removeTargetOptions() {
-            const selects = document.querySelectorAll('select');
-            selects.forEach(select => {
-                [...select.options].forEach((option, i) => {
-                    if (option.value === 'audio/ad/target.wav' || option.value === 'audio/ad/target.mp3') {
-                        select.remove(i);
-                    }
-                });
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', resolveTargetFormat);
-    </script>
     <br /><br />
-    <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">
-        Clear target audio
-    </a>
+    <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">Clear target audio</a>
     <br /><br />
-    <a href="https://github.com/jc1bm/audio-ad-break/upload/main/audio/ad" target="_blank">
-        Upload target audio
-    </a>
+    <a href="https://github.com/jc1bm/audio-ad-break/upload/main/audio/ad" target="_blank">Upload target audio</a>
 </body>
 </html>
