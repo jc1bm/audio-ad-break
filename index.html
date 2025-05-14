@@ -1,106 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ad-In-Situ Maker</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Audio Ad Break</title>
 </head>
 <body>
-  <div class="container">
-    <h1>Ad-In-Situ Maker</h1>
 
-    <div class="section">
-      <div class="dropdown-container">
-        <label>Station In</label>
-        <select id="station_in">
-          <option value="audio/station/absolute.wav">Absolute</option>
-          <option value="audio/station/sting2.wav">Sting 2</option>
-          <option value="audio/ad/none.wav">None</option>
-        </select>
+  <h1>Audio Ad Break</h1>
 
-        <label>Gap</label>
-        <select id="gap0">
-          <option value="audio/ad/gap.wav">Gap</option>
-          <option value="audio/ad/none.wav">None</option>
-        </select>
-      </div>
-    </div>
+  <select id="sting">
+      <option value="absolute.wav">Sting 1</option>
+      <option value="sting2.wav">Sting 2</option>
+  </select>
 
-    <!-- Ad Slots -->
-    <div id="ads-container" class="section"></div>
+  <select id="ad1">
+      <option value="ad1.wav">Ad 1</option>
+      <option value="ad2.wav">Ad 2</option>
+  </select>
 
-    <div class="section">
-      <label>Station Out</label>
-      <select id="station_out">
-        <option value="audio/station/absolute.wav">Absolute</option>
-        <option value="audio/station/sting2.wav">Sting 2</option>
-        <option value="audio/ad/none.wav">None</option>
-      </select>
-    </div>
+  <button onclick="createAdBreak()">Generate Ad Break</button>
 
-    <div class="section">
-      <label>Export Type</label>
-      <select id="exportType">
-        <option value="audio">Audio Only (WAV)</option>
-        <option value="video">Video with Image (MP4)</option>
-      </select>
-    </div>
-
-    <div class="section">
-      <label for="coverImage">Select Cover Image:</label>
-      <select id="coverImage">
-        <option value="images/absolute.jpg">Absolute</option>
-        <option value="images/example.jpg">Example</option>
-      </select>
-    </div>
-
-    <div class="section">
-      <label>Optional Cover Image for Video</label>
-      <input type="file" id="imageInput" accept="image/*" />
-    </div>
-
-    <button onclick="createAdBreak()">Generate Ad Break</button>
-
-    <div id="progress-container">
-      <label for="progress">Processing:</label>
-      <progress id="progress" value="0" max="100"></progress>
-    </div>
-
-    <div class="links">
-      <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">Clear target audio</a>
-      <a href="https://github.com/jc1bm/audio-ad-break/upload/main/audio/ad" target="_blank">Upload target audio</a>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.2/dist/ffmpeg.min.js"></script>
-  <script type="module" src="script.js"></script>
-
-  <script>
-    const adOptions = `
-      <option value="audio/ad/ad1.wav">Ad 1</option>
-      <option value="audio/ad/ad2.wav">Ad 2</option>
-      <option value="audio/ad/ad3.wav">Ad 3</option>
-      <option value="audio/ad/ad4.wav">Ad 4</option>
-      <option value="audio/ad/ad5.wav">Ad 5</option>
-      <option value="audio/ad/ad6.wav">Ad 6</option>
-      <option value="audio/ad/ad7.wav">Ad 7</option>
-      <option value="audio/ad/ad8.wav">Ad 8</option>
-      <option value="audio/ad/none.wav">None</option>
-      <option value="audio/ad/target.wav">Target Wav</option>
-    `;
-
-    const adsContainer = document.getElementById('ads-container');
-    for (let i = 1; i <= 7; i++) {
-      adsContainer.innerHTML += `
-        <div class="ad-block">
-          <select id="ad${i}">${adOptions}</select>
-          <select id="gap${i}">
-            <option value="audio/ad/gap.wav">Gap</option>
-            <option value="audio/ad/none.wav">None</option>
-          </select>
-        </div>
-      `;
-    }
-  </script>
+  <!-- ✅ Properly linked script -->
+  <script src="script.js" defer></script>
 </body>
 </html>
