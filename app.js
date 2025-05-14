@@ -93,14 +93,14 @@ document.getElementById("exportAudio").addEventListener("click", async () => {
 document.getElementById("exportVideo").addEventListener("click", async () => {
   const buffer = await buildSequence();
 
-  // Create MediaStreamDestination and BufferSource
+  // Create MediaStreamDestination with the SAME AudioContext
   const dest = audioContext.createMediaStreamDestination();
   const source = audioContext.createBufferSource();
   source.buffer = buffer;
   source.connect(dest);
   source.start();
 
-  // Draw image on canvas
+  // Canvas setup
   const canvas = document.createElement("canvas");
   canvas.width = 1280;
   canvas.height = 720;
