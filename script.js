@@ -1,9 +1,22 @@
 async function createAdBreak() {
   const files = [
-    document.getElementById('station').value,
-    document.getElementById('ad1').value,
-    document.getElementById('ad2').value,
-    document.getElementById('ad3').value
+        document.getElementById('station_in').value,
+        document.getElementById('gap0').value,
+        document.getElementById('ad1').value,
+        document.getElementById('gap1').value,
+        document.getElementById('ad2').value,
+        document.getElementById('gap2').value,
+        document.getElementById('ad3').value,
+        document.getElementById('gap3').value,
+        document.getElementById('ad4').value,
+        document.getElementById('gap4').value,
+        document.getElementById('ad5').value,
+        document.getElementById('gap5').value,
+        document.getElementById('ad6').value,
+        document.getElementById('gap6').value,
+        document.getElementById('ad7').value,
+        document.getElementById('gap7').value,
+        document.getElementById('station_out').value
   ];
   const imagePath = document.getElementById('image').value;
   const exportAsVideo = document.getElementById('exportAsVideo').checked;
