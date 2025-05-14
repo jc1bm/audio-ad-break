@@ -190,11 +190,7 @@
 
   function getAudioContext() {
     if (!audioContext) {
-      if (window.AudioContext || window.webkit
-
-ChatGPT said:
-
-AudioContext) {
+      if (window.AudioContext || window.webkitAudioContext) {
 audioContext = new (window.AudioContext || window.webkitAudioContext)();
 } else {
 alert("Web Audio API is not supported in this browser.");
