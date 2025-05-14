@@ -1,4 +1,3 @@
-<script>
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 async function fetchAudioBuffer(url) {
@@ -93,14 +92,12 @@ document.getElementById("exportAudio").addEventListener("click", async () => {
 document.getElementById("exportVideo").addEventListener("click", async () => {
   const buffer = await buildSequence();
 
-  // Create MediaStreamDestination with the SAME AudioContext
   const dest = audioContext.createMediaStreamDestination();
   const source = audioContext.createBufferSource();
   source.buffer = buffer;
   source.connect(dest);
   source.start();
 
-  // Canvas setup
   const canvas = document.createElement("canvas");
   canvas.width = 1280;
   canvas.height = 720;
@@ -129,4 +126,3 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   recorder.start();
   setTimeout(() => recorder.stop(), buffer.duration * 1000);
 });
-</script>
