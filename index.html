@@ -186,7 +186,6 @@
 
   <button id="exportAudio">Export Audio</button>
   <button id="exportVideo">Export Video</button>
-
 <script>
   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -274,12 +273,14 @@
   }
 
   document.getElementById("exportAudio").addEventListener("click", async () => {
+    await audioContext.resume(); // <-- Resume AudioContext on user gesture
     const buffer = await buildSequence();
     const wavBlob = bufferToWav(buffer);
     downloadBlob(wavBlob, "adbreak.wav");
   });
 
   document.getElementById("exportVideo").addEventListener("click", async () => {
+    await audioContext.resume(); // <-- Resume AudioContext on user gesture
     const buffer = await buildSequence();
 
     const dest = audioContext.createMediaStreamDestination();
@@ -317,6 +318,7 @@
     setTimeout(() => recorder.stop(), buffer.duration * 1000);
   });
 </script>
+
 </body>
 </html>
 
