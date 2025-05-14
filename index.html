@@ -39,16 +39,24 @@
 
   <label>Outro</label>
   <select id="outro"></select>
+  
+<select id="imageSelect">
+  <option value="img1.jpg">Image 1</option>
+  <option value="img2.jpg">Image 2</option>
+</select>
 
-  <label>Image for Video</label>
-  <select id="imageSelect"></select>
+<button onclick="exportAudio()">Export as Audio</button>
+<button onclick="exportVideo()">Export as Video</button>
 
-  <button id="exportAudio">Export Audio (WAV)</button>
-  <button id="exportVideo">Export Video (WEBM)</button>
+<div id="progress"></div>
 
   <div id="progress">Status: Idle</div>
 
   <script src="ffmpeg/ffmpeg.min.js"></script>
   <script type="module" src="script.js"></script>
+
+
+<div id="progress"></div>
+
 </body>
 </html>
