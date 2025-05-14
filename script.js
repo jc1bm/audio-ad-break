@@ -17,6 +17,8 @@ async function createAdBreak() {
         document.getElementById('ad7').value,
         document.getElementById('gap7').value,
         document.getElementById('station_out').value
+        document.getElementById('image').value
+
   ];
   const imagePath = document.getElementById('image').value;
   const exportAsVideo = document.getElementById('exportAsVideo').checked;
