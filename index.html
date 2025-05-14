@@ -2,61 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ad-In-Situ Maker</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    select, button { margin: 10px 0; display: block; width: 100%; max-width: 400px; }
-    #progress { margin-top: 20px; }
-  </style>
+  <title>Ad In Situ Maker</title>
 </head>
 <body>
-  <h1>Ad-In-Situ Maker</h1>
+  <h1>Ad In Situ Maker</h1>
 
-  <label>Intro</label>
-  <select id="intro"></select>
+  <!-- Your existing dropdowns -->
+  <div id="selectors">
+    <!-- Put your dropdowns here exactly as you listed -->
+    <!-- For simplicity, we’ll assume they’re already inside this div -->
+  </div>
 
-  <label>Ad 1</label>
-  <select id="ad1"></select>
+  <br />
+  <label for="videoImage">Select Image for Video:</label>
+  <select id="videoImage">
+    <option value="images/default.jpg">Default</option>
+    <option value="images/cover1.jpg">Cover 1</option>
+    <option value="images/cover2.jpg">Cover 2</option>
+  </select>
 
-  <label>Ad 2</label>
-  <select id="ad2"></select>
+  <br /><br />
 
-  <label>Ad 3</label>
-  <select id="ad3"></select>
+  <button id="exportAudio">Export Audio</button>
+  <button id="exportVideo">Export Video</button>
 
-  <label>Ad 4</label>
-  <select id="ad4"></select>
-
-  <label>Ad 5</label>
-  <select id="ad5"></select>
-
-  <label>Ad 6</label>
-  <select id="ad6"></select>
-
-  <label>Ad 7</label>
-  <select id="ad7"></select>
-
-  <label>Outro</label>
-  <select id="outro"></select>
-  
-<select id="imageSelect">
-  <option value="img1.jpg">Image 1</option>
-  <option value="img2.jpg">Image 2</option>
-</select>
-
-<button onclick="exportAudio()">Export as Audio</button>
-<button onclick="exportVideo()">Export as Video</button>
-
-<div id="progress"></div>
-
-  <div id="progress">Status: Idle</div>
-
-  <script src="ffmpeg/ffmpeg.min.js"></script>
-  <script type="module" src="script.js"></script>
-
-
-<div id="progress"></div>
-
+  <script src="app.js"></script>
 </body>
 </html>
