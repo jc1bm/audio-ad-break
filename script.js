@@ -1,8 +1,23 @@
 function createAdBreak() {
-    let sting = document.getElementById('sting').value;
-    let ad1 = document.getElementById('ad1').value;
-
-    let audioFiles = [sting, ad1]; // Add all selected files
+    let audioFiles = [
+        document.getElementById('station_in').value,
+        document.getElementById('gap0').value,
+        document.getElementById('ad1').value,
+        document.getElementById('gap1').value,
+        document.getElementById('ad2').value,
+        document.getElementById('gap2').value,
+        document.getElementById('ad3').value,
+        document.getElementById('gap3').value,
+        document.getElementById('ad4').value,
+        document.getElementById('gap4').value,
+        document.getElementById('ad5').value,
+        document.getElementById('gap5').value,
+        document.getElementById('ad6').value,
+        document.getElementById('gap6').value,
+        document.getElementById('ad7').value,
+        document.getElementById('gap7').value,
+        document.getElementById('station_out').value
+    ];
 
     let audioContext = new AudioContext();
     let finalBuffer = null;
@@ -17,7 +32,7 @@ function createAdBreak() {
         let buffers = await Promise.all(audioFiles.map(fetchAudio));
         let totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
         finalBuffer = audioContext.createBuffer(1, totalLength, audioContext.sampleRate);
-        
+
         let offset = 0;
         buffers.forEach(buffer => {
             finalBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
@@ -46,7 +61,6 @@ function createAdBreak() {
             offset = 44,
             pos = 0;
 
-        // WAV header
         writeUTFBytes(view, 0, 'RIFF');
         view.setUint32(4, length - 8, true);
         writeUTFBytes(view, 8, 'WAVE');
@@ -61,7 +75,6 @@ function createAdBreak() {
         writeUTFBytes(view, 36, 'data');
         view.setUint32(40, length - 44, true);
 
-        // Write audio samples
         for (let i = 0; i < numOfChan; i++) {
             channels.push(abuffer.getChannelData(i));
         }
