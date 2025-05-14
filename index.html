@@ -187,40 +187,38 @@
 
   <!-- ✅ Dynamic file format detection -->
   <script>
-    async function resolveTargetFormat() {
-      const basePath = 'audio/ad/target';
-      const formats = ['.wav', '.mp3'];
-      let found = false;
-
-      for (const ext of formats) {
-        const url = basePath + ext;
+async function resolveTargetFormat() {
+    const basePath = 'audio/ad/target';
+    const formats = ['.wav', '.mp3'];
+    let found = false;
+    for (const ext of formats) {
+        const url = `${basePath}${ext}`;  // using template literal
         try {
-          const res = await fetch(url, { method: 'HEAD' });
-          if (res.ok) {
-            updateTargetOption(ext);
-            found = true;
-            break;
-          }
+            const res = await fetch(url, { method: 'HEAD' });
+            if (res.ok) {
+                updateTargetOption(ext);
+                found = true;
+                break;
+            }
         } catch (e) {
-          console.warn(Could not load ${url});
+            console.warn(`Could not load ${url}`); // Correctly using template literal in a warn
         }
-      }
-
-      if (!found) {
+    }
+    if (!found) {
         removeTargetOptions();
-      }
     }
+}
 
-    function updateTargetOption(ext) {
-      const selects = document.querySelectorAll('select');
-      selects.forEach(select => {
+function updateTargetOption(ext) {
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
         [...select.options].forEach(option => {
-          if (option.value.includes('audio/ad/target')) {
-            option.value = audio/ad/target${ext};
-          }
+            if (option.value.includes('audio/ad/target')) {
+                option.value = `audio/ad/target${ext}`; // using template literal
+            }
         });
-      });
-    }
+    });
+}
 
     function removeTargetOptions() {
       const selects = document.querySelectorAll('select');
