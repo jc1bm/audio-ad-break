@@ -2,202 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ad-In-Situ Maker</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    select, button { margin: 10px 0; display: block; width: 100%; max-width: 400px; }
+    #progress { margin-top: 20px; }
+  </style>
 </head>
 <body>
   <h1>Ad-In-Situ Maker</h1>
 
-  <!-- Station In -->
-  <select id="station_in">
-    <option value="audio/station/absolute.wav">Absolute</option>
-    <option value="audio/station/sting2.wav">Sting 2</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+  <label>Intro</label>
+  <select id="intro"></select>
 
-  <!-- Gap 0 -->
-  <select id="gap0">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-  <br><br>
+  <label>Ad 1</label>
+  <select id="ad1"></select>
 
-  <select id="ad1">
-    <option value="audio/ad/ad1.wav">Ad 1</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
+  <label>Ad 2</label>
+  <select id="ad2"></select>
 
-  <select id="gap1">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+  <label>Ad 3</label>
+  <select id="ad3"></select>
 
-  <br />
+  <label>Ad 4</label>
+  <select id="ad4"></select>
 
-  <select id="ad2">
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad1.wav">Ad 1</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
+  <label>Ad 5</label>
+  <select id="ad5"></select>
 
-  <select id="gap2">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+  <label>Ad 6</label>
+  <select id="ad6"></select>
 
-  <br />
+  <label>Ad 7</label>
+  <select id="ad7"></select>
 
-  <select id="ad3">
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad1.wav">Ad 1</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
+  <label>Outro</label>
+  <select id="outro"></select>
 
-  <select id="gap3">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
+  <label>Image for Video</label>
+  <select id="imageSelect"></select>
 
-  <br />
+  <button id="exportAudio">Export Audio (WAV)</button>
+  <button id="exportVideo">Export Video (WEBM)</button>
 
-  <select id="ad4">
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad1.wav">Ad 1</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
+  <div id="progress">Status: Idle</div>
 
-  <select id="gap4">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-
-  <select id="ad5">
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 1</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
-
-  <select id="gap5">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-
-  <select id="ad6">
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 1</option>
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
-
-  <select id="gap6">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-
-  <select id="ad7">
-    <option value="audio/ad/ad7.wav">Ad 7</option>
-    <option value="audio/ad/ad2.wav">Ad 2</option>
-    <option value="audio/ad/ad3.wav">Ad 3</option>
-    <option value="audio/ad/ad4.wav">Ad 4</option>
-    <option value="audio/ad/ad5.wav">Ad 5</option>
-    <option value="audio/ad/ad6.wav">Ad 6</option>
-    <option value="audio/ad/ad7.wav">Ad 1</option>
-    <option value="audio/ad/ad8.wav">Ad 8</option>
-    <option value="audio/ad/none.wav">None</option>
-    <option value="audio/ad/target.wav">Target Wav</option>
-  </select>
-
-  <select id="gap7">
-    <option value="audio/ad/gap.wav">Gap</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br />
-  <br />
-
-  ${[...Array(7)].map((_, i) => `
-    <select id="ad${i+1}">
-      ${[1,2,3,4,5,6,7,8].map(num => `<option value="audio/ad/ad${num}.wav">Ad ${num}</option>`).join('')}
-      <option value="audio/ad/none.wav">None</option>
-      <option value="audio/ad/target.wav">Target Wav</option>
-    </select>
-    <select id="gap${i+1}">
-      <option value="audio/ad/gap.wav">Gap</option>
-      <option value="audio/ad/none.wav">None</option>
-    </select>
-    <br>
-  `).join('')}
-
-  <!-- Station Out -->
-  <select id="station_out">
-    <option value="audio/station/absolute.wav">Absolute</option>
-    <option value="audio/station/sting2.wav">Sting 2</option>
-    <option value="audio/ad/none.wav">None</option>
-  </select>
-
-  <br><br>
-  <button id="generate">Generate Ad Break</button>
-
-  <br><br>
-
-  <a href="https://github.com/jc1bm/audio-ad-break/tree/main/audio/ad" target="_blank">
-    Clear target audio
-  </a>
-
-  <br><br>
-
-  <a href="https://github.com/jc1bm/audio-ad-break/upload/main/audio/ad" target="_blank">
-    Upload target audio
-  </a>
-
-  <!-- Load script -->
-  <script src="script.js" defer></script>
+  <script src="ffmpeg/ffmpeg.min.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
