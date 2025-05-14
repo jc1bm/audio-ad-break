@@ -98,3 +98,59 @@ function createAdBreak() {
 
     mergeAudio();
 }
+
+async function createVideo() {
+  const imageFilePath = document.getElementById('image_selector').value;
+  const audioBuffer = finalBuffer; // Assuming finalBuffer holds the merged audio
+
+  // Create an audio context if not already available
+  let audioContext = new AudioContext();
+  let audioSource = audioContext.createBufferSource();
+  audioSource.buffer = audioBuffer;
+
+  // Create a canvas element
+  let canvas = document.createElement('canvas');
+  canvas.width = 720; // Standard mobile resolution
+  canvas.height = 1280;
+  let ctx = canvas.getContext('2d');
+
+  // Draw image onto canvas
+  let image = new Image();
+  image.src = imageFilePath;
+  
+  image.onload = function() {
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    
+    // Add audio to video via MediaRecorder
+    let stream = canvas.captureStream();
+    let mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'video/webm',
+    });
+
+    let videoChunks = [];
+    mediaRecorder.ondataavailable = function(event) {
+      videoChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = function() {
+      let blob = new Blob(videoChunks, { type: 'video/webm' });
+      let url = URL.createObjectURL(blob);
+      let a = document.createElement('a');
+      a.href = url;
+      a.download = 'audio_video.webm';
+      a.click();
+    };
+
+    // Convert audioBuffer to a track and add it to the stream
+    let audioDestination = audioContext.createMediaStreamDestination();
+    audioSource.connect(audioDestination);
+    stream.addTrack(audioDestination.stream.getAudioTracks()<source_id data="0" title="N/A" />);
+    
+    audioSource.start(0); // Start playing audio
+    mediaRecorder.start();
+
+    setTimeout(() => {
+      mediaRecorder.stop();
+    }, audioBuffer.duration * 1000); // Stop recording after audio finishes
+  };
+}
