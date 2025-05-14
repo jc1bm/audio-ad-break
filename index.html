@@ -5,22 +5,114 @@
   <title>Audio Ad Break</title>
 </head>
 <body>
-
   <h1>Audio Ad Break</h1>
 
-  <select id="sting">
-      <option value="absolute.wav">Sting 1</option>
-      <option value="sting2.wav">Sting 2</option>
+  <select id="station">
+      <option value="audio/station/absolute.wav">Absolute</option>
+      <option value="audio/station/sting2.wav">Sting 2</option>
   </select>
 
   <select id="ad1">
-      <option value="ad1.wav">Ad 1</option>
-      <option value="ad2.wav">Ad 2</option>
+      <option value="audio/station/ad1.wav">Ad 1</option>
+      <option value="audio/station/ad2.wav">Ad 2</option>
+  </select>
+
+  <select id="ad2">
+      <option value="audio/station/ad1.wav">Ad 1</option>
+      <option value="audio/station/ad2.wav">Ad 2</option>
+  </select>
+
+  <select id="ad3">
+      <option value="audio/station/ad1.wav">Ad 1</option>
+      <option value="audio/station/ad2.wav">Ad 2</option>
   </select>
 
   <button onclick="createAdBreak()">Generate Ad Break</button>
 
-  <!-- ✅ Properly linked script -->
-  <script src="script.js" defer></script>
+  <br /><br />
+
+  <select id="image">
+    <option value="images/absolute.jpg">Absolute</option>
+    <option value="images/hits.jpg">Hits</option>
+  </select>
+
+  <label>
+    <input type="checkbox" id="exportAsVideo" /> Export as MP4 video (WebM)
+  </label>
+
+  <canvas id="videoCanvas" width="640" height="360" style="display:none;"></canvas>
+
+  <script defer>
+    async function createAdBreak() {
+      const files = [
+        document.getElementById('station').value,
+        document.getElementById('ad1').value,
+        document.getElementById('ad2').value,
+        document.getElementById('ad3').value
+      ];
+      const imagePath = document.getElementById('image').value;
+      const exportAsVideo = document.getElementById('exportAsVideo').checked;
+
+      const audioCtx = new AudioContext();
+
+      async function fetchAndDecode(url) {
+        const res = await fetch(url);
+        const arrayBuffer = await res.arrayBuffer();
+        return await audioCtx.decodeAudioData(arrayBuffer);
+      }
+
+      const audioBuffers = await Promise.all(files.map(fetchAndDecode));
+      const totalLength = audioBuffers.reduce((sum, b) => sum + b.length, 0);
+      const outputBuffer = audioCtx.createBuffer(1, totalLength, audioCtx.sampleRate);
+
+      let offset = 0;
+      audioBuffers.forEach(buffer => {
+        outputBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
+        offset += buffer.length;
+      });
+
+      const source = audioCtx.createBufferSource();
+      source.buffer = outputBuffer;
+
+      const dest = audioCtx.createMediaStreamDestination();
+      source.connect(dest);
+
+      const canvas = document.getElementById('videoCanvas');
+      const ctx = canvas.getContext('2d');
+
+      const img = new Image();
+      img.src = imagePath;
+
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const canvasStream = canvas.captureStream();
+        const combinedStream = new MediaStream([
+          ...canvasStream.getVideoTracks(),
+          ...dest.stream.getAudioTracks()
+        ]);
+
+        const recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+        const chunks = [];
+
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'ad-break.webm';
+          a.click();
+        };
+
+        recorder.start();
+        source.start();
+
+        const duration = outputBuffer.duration * 1000;
+        setTimeout(() => recorder.stop(), duration);
+      };
+    }
+  </script>
 </body>
 </html>
