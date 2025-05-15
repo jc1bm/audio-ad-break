@@ -453,9 +453,6 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const videoBlob = new Blob([data.buffer], { type: 'video/webm' });
   downloadBlob(videoBlob, 'adbreak.webm');
 
-  const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true });
-
 });
 
 
