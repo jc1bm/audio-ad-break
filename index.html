@@ -352,36 +352,68 @@ const buffer = await buildSequence(context);
 const wavBlob = bufferToWav(buffer);
 downloadBlob(wavBlob, "adbreak.wav");
 });
-
 document.getElementById("exportVideo").addEventListener("click", async () => {
-const context = getAudioContext();
-if (!context) return;
-const buffer = await buildSequence(context);
+  const context = getAudioContext();
+  if (!context) return;
 
-const dest = context.createMediaStreamDestination();
-const source = context.createBufferSource();
-source.buffer = buffer;
-source.connect(dest);
-source.start();
+  const buffer = await buildSequence(context);
+  const selectedImage = document.getElementById("videoImage").value;
 
-const stream = dest.stream;
+  // Create canvas and draw the selected image
+  const canvas = document.createElement("canvas");
+  canvas.width = 1280;
+  canvas.height = 720;
+  const ctx = canvas.getContext("2d");
 
-const selectedImage = document.getElementById("videoImage").value;
+  const image = new Image();
+  image.crossOrigin = "anonymous";
+  image.src = selectedImage;
 
-const videoStream = await createVideoWithAudio(stream, selectedImage);
+  await new Promise((resolve, reject) => {
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve();
+    };
+    image.onerror = reject;
+  });
 
-// Create download link for WebM video
-const videoBlob = new Blob([videoStream], { type: "video/webm" });
-downloadBlob(videoBlob, "adbreak.webm");
+  // Capture canvas stream (30 FPS)
+  const canvasStream = canvas.captureStream(30);
 
+  // Create audio stream from the audio buffer
+  const dest = context.createMediaStreamDestination();
+  const source = context.createBufferSource();
+  source.buffer = buffer;
+  source.connect(dest);
+  source.start();
+  const audioStream = dest.stream;
+
+  // Combine canvas and audio streams
+  const combinedStream = new MediaStream([
+    ...canvasStream.getVideoTracks(),
+    ...audioStream.getAudioTracks()
+  ]);
+
+  // Record the combined stream
+  const recorder = new MediaRecorder(combinedStream, {
+    mimeType: "video/webm"
+  });
+
+  const chunks = [];
+  recorder.ondataavailable = (e) => chunks.push(e.data);
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: "video/webm" });
+    downloadBlob(blob, "adbreak.webm");
+  };
+
+  recorder.start();
+
+  // Stop recording after audio buffer duration
+  setTimeout(() => {
+    recorder.stop();
+  }, (buffer.duration + 0.2) * 1000); // add a bit of padding
 });
 
-// Placeholder function: you need to implement createVideoWithAudio using MediaRecorder, canvas, etc.
-async function createVideoWithAudio(audioStream, imagePath) {
-// This function depends on your existing video export implementation.
-// I’m leaving it as-is because it's out of the scope for AudioContext fix.
-alert("Video export not implemented in this snippet.");
-return null;
 }
 </script>
 </body> </html>
