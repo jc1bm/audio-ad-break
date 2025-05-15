@@ -5,7 +5,7 @@
   <title>Ad In Situ Maker</title>
 <script src="ffmpeg-core/ffmpeg.min.js"></script></head>
 <body>
-  <h1>Ad In Situ Maker 7</h1>
+  <h1>Ad In Situ Maker 8</h1>
 
   <!-- Your existing dropdowns -->
   <div id="selectors">
@@ -396,7 +396,8 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
 
   // Record the combined stream
   const recorder = new MediaRecorder(combinedStream, {
-    mimeType: "video/webm"
+  mimeType: "video/mp4"
+});
   });
 
   const chunks = [];
@@ -446,12 +447,12 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
     '-loop', '1',
     '-i', imageName,
     '-i', 'audio.wav',
-    '-c:v', 'libvpx-vp9',
-    '-c:a', 'libvorbis',
+    '-c:v', 'libx264',  // MP4 codec
+    '-c:a', 'aac',     // MP4 audio codec
     '-shortest',
     '-pix_fmt', 'yuv420p',
     '-y',
-    'output.webm'
+    'output.mp4'
   );
 
   const data = ffmpeg.FS('readFile', 'output.webm');
