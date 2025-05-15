@@ -398,7 +398,6 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const recorder = new MediaRecorder(combinedStream, {
   mimeType: "video/mp4"
 });
-  });
 
   const chunks = [];
   recorder.ondataavailable = (e) => chunks.push(e.data);
