@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Ad In Situ Maker</title>
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.4/dist/ffmpeg.min.js"></script>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.4"></script>
 </head>
 <body>
-  <h1>Ad In Situ Maker 1</h1>
+  <h1>Ad In Situ Maker 2</h1>
 
   <!-- Your existing dropdowns -->
   <div id="selectors">
@@ -453,6 +453,10 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const data = ffmpeg.FS('readFile', 'output.webm');
   const videoBlob = new Blob([data.buffer], { type: 'video/webm' });
   downloadBlob(videoBlob, 'adbreak.webm');
+
+  const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log: true });
+
 });
 
 
