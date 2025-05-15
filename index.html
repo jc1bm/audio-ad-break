@@ -419,7 +419,6 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const wavBlob = bufferToWav(buffer);
   const wavArrayBuffer = await wavBlob.arrayBuffer();
 
-  const { createFFmpeg } = FFmpeg;
   const ffmpeg = createFFmpeg({
     log: true,
     corePath: 'ffmpeg-core/ffmpeg-core.js' // Set this to your actual path
