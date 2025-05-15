@@ -357,7 +357,8 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
 
   const buffer = await buildSequence(context);
   const selectedImage = document.getElementById("videoImage").value;
-
+});
+  
   // Create canvas and draw the selected image
   const canvas = document.createElement("canvas");
   canvas.width = 1280;
