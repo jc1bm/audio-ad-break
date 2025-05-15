@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Ad In Situ Maker</title>
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.8/dist/ffmpeg.min.js"></script>
 </head>
 <body>
-  <h1>Ad In Situ Maker 2</h1>
+  <h1>Ad In Situ Maker 3</h1>
 
   <!-- Your existing dropdowns -->
   <div id="selectors">
@@ -393,22 +393,6 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const combinedStream = new MediaStream([
     ...canvasStream.getVideoTracks(),
     ...audioStream.getAudioTracks()
-]);
-
-  const chunks = [];
-  recorder.ondataavailable = (e) => chunks.push(e.data);
-  recorder.onstop = () => {
-    const blob = new Blob(chunks, { type: "video/webm" });
-    downloadBlob(blob, "adbreak.webm");
-  };
-
-  recorder.start();
-
-  // Stop recording after audio buffer duration
-  setTimeout(() => {
-    recorder.stop();
-  }, (buffer.duration + 0.2) * 1000); // add a bit of padding
-
 });
 
 document.getElementById("exportVideo").addEventListener("click", async () => {
