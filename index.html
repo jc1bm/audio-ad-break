@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Ad In Situ Maker</title>
-<script src="ffmpeg-core/ffmpeg-core.js"></script></head>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.4/dist/ffmpeg.min.js"></script>
+</head>
 <body>
-  <h1>Ad In Situ Maker 9</h1>
+  <h1>Ad In Situ Maker 1</h1>
 
   <!-- Your existing dropdowns -->
   <div id="selectors">
@@ -392,11 +393,6 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const combinedStream = new MediaStream([
     ...canvasStream.getVideoTracks(),
     ...audioStream.getAudioTracks()
-  ]);
-
-  // Record the combined stream
-  const recorder = new MediaRecorder(combinedStream, {
-  mimeType: "video/mp4"
 });
 
   const chunks = [];
