@@ -418,25 +418,31 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
 
 document.getElementById("exportVideo").addEventListener("click", async () => {
   const context = getAudioContext();
-  const buffer = await buildSequence(context);
+  if (!context) return;
 
+  const buffer = await buildSequence(context);
   const wavBlob = bufferToWav(buffer);
   const wavArrayBuffer = await wavBlob.arrayBuffer();
 
-  const ffmpeg = FFmpeg.createFFmpeg({ log: true });
+  const { createFFmpeg } = FFmpeg;
+  const ffmpeg = createFFmpeg({
+    log: true,
+    corePath: 'ffmpeg-core/ffmpeg-core.js' // Set this to your actual path
+  });
+
   await ffmpeg.load();
 
-  // Write the audio to FFmpeg's virtual FS
+  // Write audio to FS
   ffmpeg.FS('writeFile', 'audio.wav', new Uint8Array(wavArrayBuffer));
 
-  // Load the image
+  // Load selected image
   const imageUrl = document.getElementById('videoImage').value;
   const imageResponse = await fetch(imageUrl);
   const imageData = new Uint8Array(await imageResponse.arrayBuffer());
   const imageName = 'cover.jpg';
   ffmpeg.FS('writeFile', imageName, imageData);
 
-  // Use FFmpeg to create a WebM video
+  // Generate video using FFmpeg
   await ffmpeg.run(
     '-loop', '1',
     '-i', imageName,
@@ -445,13 +451,15 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
     '-c:a', 'libvorbis',
     '-shortest',
     '-pix_fmt', 'yuv420p',
+    '-y',
     'output.webm'
   );
 
   const data = ffmpeg.FS('readFile', 'output.webm');
   const videoBlob = new Blob([data.buffer], { type: 'video/webm' });
-  downloadBlob(videoBlob, 'ad_break.webm');
+  downloadBlob(videoBlob, 'adbreak.webm');
 });
+
 
 </script>
 </body> </html>
