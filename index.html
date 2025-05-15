@@ -393,7 +393,7 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const combinedStream = new MediaStream([
     ...canvasStream.getVideoTracks(),
     ...audioStream.getAudioTracks()
-});
+]);
 
   const chunks = [];
   recorder.ondataavailable = (e) => chunks.push(e.data);
