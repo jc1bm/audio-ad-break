@@ -190,256 +190,173 @@
   function getAudioContext() {
     if (!audioContext) {
       if (window.AudioContext || window.webkitAudioContext) {
-audioContext = new (window.AudioContext || window.webkitAudioContext)();
-} else {
-alert("Web Audio API is not supported in this browser.");
-return null;
-}
-}
-return audioContext;
-}
-
-async function fetchAudioBuffer(url, context) {
-const response = await fetch(url);
-const arrayBuffer = await response.arrayBuffer();
-return await context.decodeAudioData(arrayBuffer);
-}
-
-async function buildSequence(context) {
-const selectorIds = [
-"station_in",
-"gap0",
-"ad1",
-"gap1",
-"ad2",
-"gap2",
-"ad3",
-"gap3",
-"ad4",
-"gap4",
-"ad5",
-"gap5",
-"ad6",
-"gap6",
-"ad7",
-"gap7",
-"station_out",
-];
-
-const audioBuffers = [];
-for (const id of selectorIds) {
-  const value = document.getElementById(id).value;
-  if (value === "audio/ad/none.wav") continue;
-  const buffer = await fetchAudioBuffer(value, context);
-  audioBuffers.push(buffer);
-}
-
-// Sum lengths for the output buffer duration
-const totalLength = audioBuffers.reduce((acc, b) => acc + b.length, 0);
-// Assume all buffers have same sample rate and number of channels
-const numChannels = audioBuffers[0] ? audioBuffers[0].numberOfChannels : 2;
-const sampleRate = audioBuffers[0] ? audioBuffers[0].sampleRate : 44100;
-
-const outputBuffer = context.createBuffer(numChannels, totalLength, sampleRate);
-
-// Copy each buffer into the output buffer sequentially
-let offset = 0;
-for (const buffer of audioBuffers) {
-  for (let channel = 0; channel < numChannels; channel++) {
-    const outputData = outputBuffer.getChannelData(channel);
-    const inputData = buffer.getChannelData(channel % buffer.numberOfChannels);
-    outputData.set(inputData, offset);
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      } else {
+        alert("Web Audio API is not supported in this browser.");
+        return null;
+      }
+    }
+    return audioContext;
   }
-  offset += buffer.length;
-}
 
-return outputBuffer;
+  async function fetchAudioBuffer(url, context) {
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    return await context.decodeAudioData(arrayBuffer);
+  }
 
-}
+  async function buildSequence(context) {
+    const selectorIds = [
+      "station_in", "gap0", "ad1", "gap1", "ad2", "gap2", "ad3", "gap3",
+      "ad4", "gap4", "ad5", "gap5", "ad6", "gap6", "ad7", "gap7", "station_out"
+    ];
 
-// Converts AudioBuffer to WAV Blob (assuming 16-bit PCM)
-function bufferToWav(buffer) {
-const numChannels = buffer.numberOfChannels;
-const sampleRate = buffer.sampleRate;
-const format = 1; // PCM
-const bitDepth = 16;
+    const audioBuffers = [];
+    for (const id of selectorIds) {
+      const value = document.getElementById(id).value;
+      if (value === "audio/ad/none.wav") continue;
+      const buffer = await fetchAudioBuffer(value, context);
+      audioBuffers.push(buffer);
+    }
 
-let samples;
-if (numChannels === 2) {
-  const left = buffer.getChannelData(0);
-  const right = buffer.getChannelData(1);
-  samples = interleave(left, right);
-} else {
-  samples = buffer.getChannelData(0);
-}
+    const totalLength = audioBuffers.reduce((acc, b) => acc + b.length, 0);
+    const numChannels = audioBuffers[0] ? audioBuffers[0].numberOfChannels : 2;
+    const sampleRate = audioBuffers[0] ? audioBuffers[0].sampleRate : 44100;
+    const outputBuffer = context.createBuffer(numChannels, totalLength, sampleRate);
 
-const dataLength = samples.length * (bitDepth / 8);
-const bufferLength = 44 + dataLength;
-const wavBuffer = new ArrayBuffer(bufferLength);
-const view = new DataView(wavBuffer);
+    let offset = 0;
+    for (const buffer of audioBuffers) {
+      for (let channel = 0; channel < numChannels; channel++) {
+        const outputData = outputBuffer.getChannelData(channel);
+        const inputData = buffer.getChannelData(channel % buffer.numberOfChannels);
+        outputData.set(inputData, offset);
+      }
+      offset += buffer.length;
+    }
 
-// RIFF chunk descriptor
-writeString(view, 0, 'RIFF');
-view.setUint32(4, 36 + dataLength, true);
-writeString(view, 8, 'WAVE');
+    return outputBuffer;
+  }
 
-// FMT sub-chunk
-writeString(view, 12, 'fmt ');
-view.setUint32(16, 16, true); // Subchunk1Size
-view.setUint16(20, format, true); // AudioFormat
-view.setUint16(22, numChannels, true);
-view.setUint32(24, sampleRate, true);
-view.setUint32(28, sampleRate * numChannels * bitDepth / 8, true); // ByteRate
-view.setUint16(32, numChannels * bitDepth / 8, true); // BlockAlign
-view.setUint16(34, bitDepth, true);
+  function bufferToWav(buffer) {
+    const numChannels = buffer.numberOfChannels;
+    const sampleRate = buffer.sampleRate;
+    const format = 1; // PCM
+    const bitDepth = 16;
 
-// Data sub-chunk
-writeString(view, 36, 'data');
-view.setUint32(40, dataLength, true);
+    let samples;
+    if (numChannels === 2) {
+      const left = buffer.getChannelData(0);
+      const right = buffer.getChannelData(1);
+      samples = interleave(left, right);
+    } else {
+      samples = buffer.getChannelData(0);
+    }
 
-// Write PCM samples
-floatTo16BitPCM(view, 44, samples);
+    const dataLength = samples.length * (bitDepth / 8);
+    const bufferLength = 44 + dataLength;
+    const wavBuffer = new ArrayBuffer(bufferLength);
+    const view = new DataView(wavBuffer);
 
-return new Blob([view], { type: 'audio/wav' });
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + dataLength, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, format, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * numChannels * bitDepth / 8, true);
+    view.setUint16(32, numChannels * bitDepth / 8, true);
+    view.setUint16(34, bitDepth, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, dataLength, true);
 
-}
+    floatTo16BitPCM(view, 44, samples);
+    return new Blob([view], { type: 'audio/wav' });
+  }
 
-function writeString(view, offset, string) {
-for (let i = 0; i < string.length; i++) {
-view.setUint8(offset + i, string.charCodeAt(i));
-}
-}
+  function writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  }
 
-function floatTo16BitPCM(output, offset, input) {
-for (let i = 0; i < input.length; i++, offset += 2) {
-let s = Math.max(-1, Math.min(1, input[i]));
-s = s < 0 ? s * 0x8000 : s * 0x7FFF;
-output.setInt16(offset, s, true);
-}
-}
+  function floatTo16BitPCM(output, offset, input) {
+    for (let i = 0; i < input.length; i++, offset += 2) {
+      let s = Math.max(-1, Math.min(1, input[i]));
+      s = s < 0 ? s * 0x8000 : s * 0x7FFF;
+      output.setInt16(offset, s, true);
+    }
+  }
 
-function interleave(left, right) {
-const length = left.length + right.length;
-const result = new Float32Array(length);
+  function interleave(left, right) {
+    const length = left.length + right.length;
+    const result = new Float32Array(length);
+    let inputIndex = 0;
+    for (let index = 0; index < length;) {
+      result[index++] = left[inputIndex];
+      result[index++] = right[inputIndex];
+      inputIndex++;
+    }
+    return result;
+  }
 
-let inputIndex = 0;
-for (let index = 0; index < length;) {
-  result[index++] = left[inputIndex];
-  result[index++] = right[inputIndex];
-  inputIndex++;
-}
-return result;
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.style = "display:none";
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    URL.revokeObjectURL(url);
+    a.remove();
+  }
 
-}
-
-function downloadBlob(blob, filename) {
-const url = URL.createObjectURL(blob);
-const a = document.createElement("a");
-a.style = "display:none";
-a.href = url;
-a.download = filename;
-document.body.appendChild(a);
-a.click();
-URL.revokeObjectURL(url);
-a.remove();
-}
-
-document.getElementById("exportAudio").addEventListener("click", async () => {
-const context = getAudioContext();
-if (!context) return;
-const buffer = await buildSequence(context);
-const wavBlob = bufferToWav(buffer);
-downloadBlob(wavBlob, "adbreak.wav");
-});
-document.getElementById("exportVideo").addEventListener("click", async () => {
-  const context = getAudioContext();
-  if (!context) return;
-
-  const buffer = await buildSequence(context);
-  const selectedImage = document.getElementById("videoImage").value;
-});
-  
-  // Create canvas and draw the selected image
-async function drawImageOnCanvas() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1280;
-  canvas.height = 720;
-  const ctx = canvas.getContext("2d");
-
-  const image = new Image();
-  image.crossOrigin = "anonymous";
-  image.src = selectedImage;
-
-  await new Promise((resolve, reject) => {
-    image.onload = () => {
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-      resolve();
-    };
-    image.onerror = reject;
+  document.getElementById("exportAudio").addEventListener("click", async () => {
+    const context = getAudioContext();
+    if (!context) return;
+    const buffer = await buildSequence(context);
+    const wavBlob = bufferToWav(buffer);
+    downloadBlob(wavBlob, "adbreak.wav");
   });
-}
-  // Capture canvas stream (30 FPS)
-  const canvasStream = canvas.captureStream(30);
 
-  // Create audio stream from the audio buffer
-  const dest = context.createMediaStreamDestination();
-  const source = context.createBufferSource();
-  source.buffer = buffer;
-  source.connect(dest);
-  source.start();
-  const audioStream = dest.stream;
+  document.getElementById("exportVideo").addEventListener("click", async () => {
+    const context = getAudioContext();
+    if (!context) return;
 
-  // Combine canvas and audio streams
-  const combinedStream = new MediaStream([
-    ...canvasStream.getVideoTracks(),
-    ...audioStream.getAudioTracks()
-]);
+    const buffer = await buildSequence(context);
+    const wavBlob = bufferToWav(buffer);
+    const wavArrayBuffer = await wavBlob.arrayBuffer();
 
-document.getElementById("exportVideo").addEventListener("click", async () => {
-  const context = getAudioContext();
-  if (!context) return;
+    const { createFFmpeg } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: true });
+    await ffmpeg.load();
 
-  const buffer = await buildSequence(context);
-  const wavBlob = bufferToWav(buffer);
-  const wavArrayBuffer = await wavBlob.arrayBuffer();
+    ffmpeg.FS('writeFile', 'audio.wav', new Uint8Array(wavArrayBuffer));
 
-const { createFFmpeg } = FFmpeg;
-const ffmpeg = createFFmpeg({
-  log: true,
-  corePath: './ffmpeg-core/ffmpeg-core.js'  // path to the core file hosted on your GH Pages
-});
+    const imageUrl = document.getElementById("videoImage").value;
+    const imageResponse = await fetch(imageUrl);
+    const imageData = new Uint8Array(await imageResponse.arrayBuffer());
+    const imageName = 'cover.jpg';
+    ffmpeg.FS('writeFile', imageName, imageData);
 
-  await ffmpeg.load();
+    await ffmpeg.run(
+      '-loop', '1',
+      '-i', imageName,
+      '-i', 'audio.wav',
+      '-c:v', 'libx264',
+      '-c:a', 'aac',
+      '-b:a', '192k',
+      '-shortest',
+      '-pix_fmt', 'yuv420p',
+      'output.mp4'
+    );
 
-  // Write audio to FS
-  ffmpeg.FS('writeFile', 'audio.wav', new Uint8Array(wavArrayBuffer));
-
-  // Load selected image
-  const imageUrl = document.getElementById('videoImage').value;
-  const imageResponse = await fetch(imageUrl);
-  const imageData = new Uint8Array(await imageResponse.arrayBuffer());
-  const imageName = 'cover.jpg';
-  ffmpeg.FS('writeFile', imageName, imageData);
-
-  // Generate video using FFmpeg
-  await ffmpeg.run(
-    '-loop', '1',
-    '-i', imageName,
-    '-i', 'audio.wav',
-    '-c:v', 'libx264',  // MP4 codec
-    '-c:a', 'aac',     // MP4 audio codec
-    '-shortest',
-    '-pix_fmt', 'yuv420p',
-    '-y',
-    'output.mp4'
-  );
-
-  const data = ffmpeg.FS('readFile', 'output.webm');
-  const videoBlob = new Blob([data.buffer], { type: 'video/webm' });
-  downloadBlob(videoBlob, 'adbreak.webm');
-
-});
-
-
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    downloadBlob(videoBlob, 'adbreak-video.mp4');
+  });
 </script>
-</body> </html>
+</body>
+</html>
