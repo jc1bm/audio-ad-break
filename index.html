@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Ad In Situ Maker</title>
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.4/dist/ffmpeg.min.js"></script></head>
-<body>
+<script src="ffmpeg-core/ffmpeg.min.js"></script><body>
   <h1>Ad In Situ Maker 4</h1>
 
   <!-- Your existing dropdowns -->
@@ -402,10 +401,11 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const wavBlob = bufferToWav(buffer);
   const wavArrayBuffer = await wavBlob.arrayBuffer();
 
-  const ffmpeg = createFFmpeg({
-    log: true,
-    corePath: 'ffmpeg-core/ffmpeg-core.js' // Set this to your actual path
-  });
+const { createFFmpeg } = FFmpeg;
+const ffmpeg = createFFmpeg({
+  log: true,
+  corePath: './ffmpeg-core/ffmpeg-core.js'  // path to the core file hosted on your GH Pages
+});
 
   await ffmpeg.load();
 
