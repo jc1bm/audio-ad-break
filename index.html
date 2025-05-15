@@ -391,7 +391,7 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   const combinedStream = new MediaStream([
     ...canvasStream.getVideoTracks(),
     ...audioStream.getAudioTracks()
-});
+]);
 
 document.getElementById("exportVideo").addEventListener("click", async () => {
   const context = getAudioContext();
