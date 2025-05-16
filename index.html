@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Ad In Situ Maker</title>
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.10.0"></script>
 </head>
 <body>
   <h1>Ad In Situ Maker 4</h1>
@@ -352,67 +353,72 @@ const buffer = await buildSequence(context);
 const wavBlob = bufferToWav(buffer);
 downloadBlob(wavBlob, "adbreak.wav");
 });
-document.getElementById("exportVideo").addEventListener("click", async () => {
-  const context = getAudioContext();
-  if (!context) return;
+  const { createFFmpeg, fetchFile } = FFmpeg;
+  const ffmpeg = createFFmpeg({ log: true });
 
-  const buffer = await buildSequence(context);
-  const selectedImage = document.getElementById("videoImage").value;
+  async function convertWebmToMp4() {
+    await ffmpeg.load();
 
-  // Create canvas and draw the selected image
-  const canvas = document.createElement("canvas");
-  canvas.width = 1280;
-  canvas.height = 720;
-  const ctx = canvas.getContext("2d");
+    const videoBlob = new Blob(chunks, { type: 'video/webm' });
+    const webmFile = 'adbreak.webm';
 
-  const image = new Image();
-  image.crossOrigin = "anonymous";
-  image.src = selectedImage;
+    ffmpeg.FS('writeFile', webmFile, await fetchFile(videoBlob));
+    await ffmpeg.run('-i', webmFile, 'adbreak.mp4');
+    const mp4Data = ffmpeg.FS('readFile', 'adbreak.mp4');
 
-  await new Promise((resolve, reject) => {
-    image.onload = () => {
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-      resolve();
+    const mp4Blob = new Blob([mp4Data.buffer], { type: 'video/mp4' });
+    downloadBlob(mp4Blob, 'adbreak.mp4');
+  }
+
+  document.getElementById("exportVideo").addEventListener("click", async () => {
+    const context = getAudioContext();
+    if (!context) return;
+    const buffer = await buildSequence(context);
+    const selectedImage = document.getElementById("videoImage").value;
+    const canvas = document.createElement("canvas");
+    canvas.width = 1280;
+    canvas.height = 720;
+    const ctx = canvas.getContext("2d");
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = selectedImage;
+    await new Promise((resolve, reject) => {
+      image.onload = () => {
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve();
+      };
+      image.onerror = reject;
+    });
+    const canvasStream = canvas.captureStream(30);
+    const dest = context.createMediaStreamDestination();
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(dest);
+    source.start();
+    const audioStream = dest.stream;
+    const combinedStream = new MediaStream([
+      ...canvasStream.getVideoTracks(),
+      ...audioStream.getAudioTracks()
+    ]);
+    const recorder = new MediaRecorder(combinedStream, {
+      mimeType: "video/webm"
+    });
+    const chunks = [];
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+    recorder.onstop = () => {
+      downloadBlob(new Blob(chunks, { type: 'video/webm' }), 'adbreak.webm');
+      convertWebmToMp4(); // Convert and download
     };
-    image.onerror = reject;
+    recorder.start();
+    setTimeout(() => {
+      recorder.stop();
+    }, (buffer.duration + 0.2) * 1000);
   });
 
-  // Capture canvas stream (30 FPS)
-  const canvasStream = canvas.captureStream(30);
+  function downloadBlob(blob, filename) {
+    // Existing download function...
+  }
 
-  // Create audio stream from the audio buffer
-  const dest = context.createMediaStreamDestination();
-  const source = context.createBufferSource();
-  source.buffer = buffer;
-  source.connect(dest);
-  source.start();
-  const audioStream = dest.stream;
-
-  // Combine canvas and audio streams
-  const combinedStream = new MediaStream([
-    ...canvasStream.getVideoTracks(),
-    ...audioStream.getAudioTracks()
-  ]);
-
-  // Record the combined stream
-  const recorder = new MediaRecorder(combinedStream, {
-    mimeType: "video/webm"
-  });
-
-  const chunks = [];
-  recorder.ondataavailable = (e) => chunks.push(e.data);
-  recorder.onstop = () => {
-    const blob = new Blob(chunks, { type: "video/webm" });
-    downloadBlob(blob, "adbreak.webm");
-  };
-
-  recorder.start();
-
-  // Stop recording after audio buffer duration
-  setTimeout(() => {
-    recorder.stop();
-  }, (buffer.duration + 0.2) * 1000); // add a bit of padding
-
-});
 </script>
-</body> </html>
+</body>
+</html>
