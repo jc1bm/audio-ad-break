@@ -236,10 +236,6 @@ async function buildSequence(context) {
 
   return output;
 }
-
-  catch (err) {
-  alert("Audio sequence could not be built: " + err.message);
-}
   
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
