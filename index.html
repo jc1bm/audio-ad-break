@@ -312,7 +312,40 @@
     const context = getAudioContext();
     if (!context) return;
     const buffer = await buildSequence(context);
-    // Video capture and creation could be modified similarly...
+    const selectedImage = document.getElementById("videoImage").value;
+    const canvas = document.createElement("canvas");
+    canvas.width = 1280;
+    canvas.height = 720;
+    const ctx = canvas.getContext("2d");
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = selectedImage;
+    await new Promise((resolve, reject) => {
+      image.onload = () => {
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve();
+      };
+      image.onerror = reject;
+    });
+    const canvasStream = canvas.captureStream(30);
+    const dest = context.createMediaStreamDestination();
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(dest);
+    source.start();
+    const audioStream = dest.stream;
+    const combinedStream = new MediaStream([...canvasStream.getVideoTracks(), ...audioStream.getAudioTracks()]);
+    const recorder = new MediaRecorder(combinedStream, { mimeType: "video/webm" });
+    const chunks = [];
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: "video/webm" });
+      downloadBlob(blob, "adbreak.webm");
+    };
+    recorder.start();
+    setTimeout(() => {
+      recorder.stop();
+    }, (buffer.duration + 0.2) * 1000);
   });
 </script>
 </body> 
