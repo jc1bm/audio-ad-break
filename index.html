@@ -201,6 +201,33 @@ function getAudioContext() {
   }
   return window.audioCtx;
 }
+
+  async function buildSequence(context) {
+  const dropdowns = document.querySelectorAll(".clip-dropdown");
+  const selectedUrls = Array.from(dropdowns)
+    .map(dropdown => dropdown.value)
+    .filter(url => url); // skip empty
+
+  const buffers = await Promise.all(
+    selectedUrls.map(async (url) => {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      return context.decodeAudioData(arrayBuffer);
+    })
+  );
+
+  // Calculate total length
+  const totalLength = buffers.reduce((sum, b) => sum + b.length, 0);
+  const output = context.createBuffer(1, totalLength, context.sampleRate);
+  let offset = 0;
+
+  for (const buffer of buffers) {
+    output.getChannelData(0).set(buffer.getChannelData(0), offset);
+    offset += buffer.length;
+  }
+
+  return output;
+}
   
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
