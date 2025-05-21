@@ -5,7 +5,7 @@
   <title>Ad In Situ Maker</title>
 </head>
 <body>
-  <h1>Ad In Situ Maker final FCNTB</h1>
+  <h1>Ad In Situ Maker final FCNTBNFRTT</h1>
 
   <!-- Your existing dropdowns -->
   <div id="selectors">
@@ -418,8 +418,8 @@ document.getElementById("exportVideo").addEventListener("click", async () => {
   setTimeout(() => {
     recorder.stop();
   }, (buffer.duration + 0.2) * 1000); // add a bit of padding
-<script>
-document.getElementById('playSequence').addEventListener('click', async () => {
+
+  document.getElementById('playSequence').addEventListener('click', async () => {
   const context = getAudioContext();
   const buffer = await buildSequence(context);
   const wavBlob = bufferToWav(buffer);
