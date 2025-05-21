@@ -202,11 +202,15 @@ function getAudioContext() {
   return window.audioCtx;
 }
 
-  async function buildSequence(context) {
+async function buildSequence(context) {
   const dropdowns = document.querySelectorAll(".clip-dropdown");
   const selectedUrls = Array.from(dropdowns)
     .map(dropdown => dropdown.value)
     .filter(url => url); // skip empty
+
+  if (selectedUrls.length === 0) {
+    throw new Error("No audio clips selected.");
+  }
 
   const buffers = await Promise.all(
     selectedUrls.map(async (url) => {
@@ -216,8 +220,12 @@ function getAudioContext() {
     })
   );
 
-  // Calculate total length
   const totalLength = buffers.reduce((sum, b) => sum + b.length, 0);
+
+  if (totalLength === 0) {
+    throw new Error("Audio clips failed to load or were empty.");
+  }
+
   const output = context.createBuffer(1, totalLength, context.sampleRate);
   let offset = 0;
 
@@ -227,6 +235,10 @@ function getAudioContext() {
   }
 
   return output;
+}
+
+  catch (err) {
+  alert("Audio sequence could not be built: " + err.message);
 }
   
 function downloadBlob(blob, filename) {
