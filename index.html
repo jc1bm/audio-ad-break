@@ -206,26 +206,55 @@ return await context.decodeAudioData(arrayBuffer);
 }
 
 async function buildSequence(context) {
-const selectorIds = [
-"station_in",
-"gap0",
-"ad1",
-"gap1",
-"ad2",
-"gap2",
-"ad3",
-"gap3",
-"ad4",
-"gap4",
-"ad5",
-"gap5",
-"ad6",
-"gap6",
-"ad7",
-"gap7",
-"station_out",
-];
+  const selectorIds = [
+    "station_in",
+    "gap0",
+    "ad1",
+    "gap1",
+    "ad2",
+    "gap2",
+    "ad3",
+    "gap3",
+    "ad4",
+    "gap4",
+    "ad5",
+    "gap5",
+    "ad6",
+    "gap6",
+    "ad7",
+    "gap7",
+    "station_out",
+  ];
 
+  // Load buffers for each selected audio
+  const buffers = [];
+  for (const id of selectorIds) {
+    const url = document.getElementById(id).value;
+    if (url && url !== "audio/ad/none.wav") { // skip "none" placeholders
+      const buffer = await fetchAudioBuffer(url, context);
+      buffers.push(buffer);
+    }
+  }
+
+  // Calculate total length in samples
+  const totalLength = buffers.reduce((sum, buf) => sum + buf.length, 0);
+
+  // Create a new AudioBuffer to hold combined audio
+  const numberOfChannels = buffers[0]?.numberOfChannels || 1;
+  const sampleRate = buffers[0]?.sampleRate || context.sampleRate;
+  const outputBuffer = context.createBuffer(numberOfChannels, totalLength, sampleRate);
+
+  // Copy data from each buffer into output buffer
+  let offset = 0;
+  buffers.forEach(buffer => {
+    for (let channel = 0; channel < numberOfChannels; channel++) {
+      outputBuffer.getChannelData(channel).set(buffer.getChannelData(channel), offset);
+    }
+    offset += buffer.length;
+  });
+
+  return outputBuffer;
+}
 async function exportToWebM(audioBuffer) {
   const canvas = document.createElement("canvas");
   canvas.width = 640;
