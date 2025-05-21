@@ -1,0 +1,281 @@
+<script>
+document.getElementById("exportVideo").addEventListener("click", async () => {
+  const context = getAudioContext();
+  const outputBuffer = await buildSequence(context);
+  exportToWebM(outputBuffer);
+});
+
+  <div id="selectors">
+    <!-- Station In -->
+    <select id="station_in">
+      <option value="audio/station/absolute.wav">Absolute</option>
+      <option value="audio/station/sting2.wav">Sting 2</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <!-- Gap and Ad Selects -->
+    <select id="gap0">
+      <option value="audio/ad/gap.wav">Gap</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <br /><br />
+
+    <select id="ad1">
+      <option value="audio/ad/ad1.wav">Ad 1</option>
+      <option value="audio/ad/ad2.wav">Ad 2</option>
+      <option value="audio/ad/ad3.wav">Ad 3</option>
+      <option value="audio/ad/ad4.wav">Ad 4</option>
+      <option value="audio/ad/ad5.wav">Ad 5</option>
+      <option value="audio/ad/ad6.wav">Ad 6</option>
+      <option value="audio/ad/ad7.wav">Ad 7</option>
+      <option value="audio/ad/ad8.wav">Ad 8</option>
+      <option value="audio/ad/none.wav">None</option>
+      <option value="audio/ad/target.wav">Target Wav</option>
+    </select>
+
+    <select id="gap1">
+      <option value="audio/ad/gap.wav">Gap</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <br />
+
+    <select id="ad2">
+      <option value="audio/ad/ad2.wav">Ad 2</option>
+      <option value="audio/ad/ad1.wav">Ad 1</option>
+      <option value="audio/ad/ad3.wav">Ad 3</option>
+      <option value="audio/ad/ad4.wav">Ad 4</option>
+      <option value="audio/ad/ad5.wav">Ad 5</option>
+      <option value="audio/ad/ad6.wav">Ad 6</option>
+      <option value="audio/ad/ad7.wav">Ad 7</option>
+      <option value="audio/ad/ad8.wav">Ad 8</option>
+      <option value="audio/ad/none.wav">None</option>
+      <option value="audio/ad/target.wav">Target Wav</option>
+    </select>
+
+    <select id="gap2">
+      <option value="audio/ad/gap.wav">Gap</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <br />
+
+    <select id="ad3">
+      <option value="audio/ad/ad3.wav">Ad 3</option>
+      <option value="audio/ad/ad2.wav">Ad 2</option>
+      <option value="audio/ad/ad1.wav">Ad 1</option>
+      <option value="audio/ad/ad4.wav">Ad 4</option>
+      <option value="audio/ad/ad5.wav">Ad 5</option>
+      <option value="audio/ad/ad6.wav">Ad 6</option>
+      <option value="audio/ad/ad7.wav">Ad 7</option>
+      <option value="audio/ad/ad8.wav">Ad 8</option>
+      <option value="audio/ad/none.wav">None</option>
+      <option value="audio/ad/target.wav">Target Wav</option>
+    </select>
+
+    <select id="gap3">
+      <option value="audio/ad/gap.wav">Gap</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <br />
+
+    <select id="ad4">
+      <option value="audio/ad/ad4.wav">Ad 4</option>
+      <option value="audio/ad/ad2.wav">Ad 2</option>
+      <option value="audio/ad/ad3.wav">Ad 3</option>
+      <option value="audio/ad/ad1.wav">Ad 1</option>
+      <option value="audio/ad/ad5.wav">Ad 5</option>
+      <option value="audio/ad/ad6.wav">Ad 6</option>
+      <option value="audio/ad/ad7.wav">Ad 7</option>
+      <option value="audio/ad/ad8.wav">Ad 8</option>
+      <option value="audio/ad/none.wav">None</option>
+      <option value="audio/ad/target.wav">Target Wav</option>
+    </select>
+
+    <select id="gap4">
+      <option value="audio/ad/gap.wav">Gap</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <br />
+
+    <select id="ad5">
+      <option value="audio/ad/ad5.wav">Ad 5</option>
+      <option value="audio/ad/ad2.wav">Ad 2</option>
+      <option value="audio/ad/ad3.wav">Ad 3</option>
+      <option value="audio/ad/ad4.wav">Ad 4</option>
+      <option value="audio/ad/ad5.wav">Ad 1</option>
+      <option value="audio/ad/ad6.wav">Ad 6</option>
+      <option value="audio/ad/ad7.wav">Ad 7</option>
+      <option value="audio/ad/ad8.wav">Ad 8</option>
+      <option value="audio/ad/none.wav">None</option>
+      <option value="audio/ad/target.wav">Target Wav</option>
+    </select>
+
+    <select id="gap5">
+      <option value="audio/ad/gap.wav">Gap</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <br />
+
+    <select id="ad6">
+      <option value="audio/ad/ad6.wav">Ad 6</option>
+      <option value="audio/ad/ad2.wav">Ad 2</option>
+      <option value="audio/ad/ad3.wav">Ad 3</option>
+      <option value="audio/ad/ad4.wav">Ad 4</option>
+      <option value="audio/ad/ad5.wav">Ad 5</option>
+      <option value="audio/ad/ad6.wav">Ad 1</option>
+      <option value="audio/ad/ad7.wav">Ad 7</option>
+      <option value="audio/ad/ad8.wav">Ad 8</option>
+      <option value="audio/ad/none.wav">None</option>
+      <option value="audio/ad/target.wav">Target Wav</option>
+    </select>
+
+    <select id="gap6">
+      <option value="audio/ad/gap.wav">Gap</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <br />
+
+    <select id="ad7">
+      <option value="audio/ad/ad7.wav">Ad 7</option>
+      <option value="audio/ad/ad2.wav">Ad 2</option>
+      <option value="audio/ad/ad3.wav">Ad 3</option>
+      <option value="audio/ad/ad4.wav">Ad 4</option>
+      <option value="audio/ad/ad5.wav">Ad 5</option>
+      <option value="audio/ad/ad6.wav">Ad 6</option>
+      <option value="audio/ad/ad7.wav">Ad 1</option>
+      <option value="audio/ad/ad8.wav">Ad 8</option>
+      <option value="audio/ad/none.wav">None</option>
+      <option value="audio/ad/target.wav">Target Wav</option>
+    </select>
+
+    <select id="gap7">
+      <option value="audio/ad/gap.wav">Gap</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+
+    <br /><br />
+
+    <!-- Station Out -->
+    <select id="station_out">
+      <option value="audio/station/absolute.wav">Absolute</option>
+      <option value="audio/station/sting2.wav">Sting 2</option>
+      <option value="audio/ad/none.wav">None</option>
+    </select>
+  </div>
+
+  <br />
+  <label for="videoImage">Select Image for Video:</label>
+  <select id="videoImage">
+    <option value="images/absolute.jpg">Absolute</option>
+    <option value="images/cover1.jpg">Cover 1</option>
+    <option value="images/cover2.jpg">Cover 2</option>
+  </select>
+
+  <br /><br />
+
+  <button id="exportAudio">Export Audio</button>
+  <button id="exportVideo">Export Video</button>
+
+<script>
+  let audioContext;
+
+  function getAudioContext() {
+    if (!audioContext) {
+      if (window.AudioContext || window.webkitAudioContext) {
+audioContext = new (window.AudioContext || window.webkitAudioContext)();
+} else {
+alert("Web Audio API is not supported in this browser.");
+return null;
+}
+}
+return audioContext;
+}
+
+async function fetchAudioBuffer(url, context) {
+const response = await fetch(url);
+const arrayBuffer = await response.arrayBuffer();
+return await context.decodeAudioData(arrayBuffer);
+}
+
+async function buildSequence(context) {
+const selectorIds = [
+"station_in",
+"gap0",
+"ad1",
+"gap1",
+"ad2",
+"gap2",
+"ad3",
+"gap3",
+"ad4",
+"gap4",
+"ad5",
+"gap5",
+"ad6",
+"gap6",
+"ad7",
+"gap7",
+"station_out",
+];
+
+async function exportToWebM(audioBuffer) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 640;
+  canvas.height = 360;
+  const ctx = canvas.getContext("2d");
+
+  // Draw static image
+  const selectedImage = document.getElementById("videoImage").value;
+  const img = new Image();
+  img.src = selectedImage;
+  await img.decode(); // Wait for image to load
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  // Capture canvas stream (video)
+  const canvasStream = canvas.captureStream(30);
+
+  // Convert audioBuffer to MediaStream
+  const audioContext = getAudioContext();
+  const destination = audioContext.createMediaStreamDestination();
+  const source = audioContext.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(destination);
+  source.start();
+
+  // Combine audio and video streams
+  const combinedStream = new MediaStream();
+  canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
+  destination.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+
+  // Record the stream
+  const mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+  const chunks = [];
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data.size > 0) chunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ad-break.webm";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  mediaRecorder.start();
+
+  // Stop after audio duration
+  setTimeout(() => {
+    mediaRecorder.stop();
+  }, audioBuffer.duration * 1000);
+}
+</script>
