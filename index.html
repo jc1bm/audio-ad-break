@@ -10,21 +10,21 @@
   <!-- Your existing dropdowns -->
   <div id="selectors">
     <!-- Station In -->
-    <select id="station_in">
+    <select id="station_in" class="clip-dropdown">
       <option value="audio/station/absolute.wav">Absolute</option>
       <option value="audio/station/sting2.wav">Sting 2</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
 
     <!-- Gap and Ad Selects -->
-    <select id="gap0">
+    <select id="gap0" class="clip-dropdown">
       <option value="audio/ad/gap.wav">Gap</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
 
     <br /><br />
 
-    <select id="ad1">
+    <select id="ad1" class="clip-dropdown">
       <option value="audio/ad/ad1.wav">Ad 1</option>
       <option value="audio/ad/ad2.wav">Ad 2</option>
       <option value="audio/ad/ad3.wav">Ad 3</option>
@@ -37,14 +37,14 @@
       <option value="audio/ad/target.wav">Target Wav</option>
     </select>
 
-    <select id="gap1">
+    <select id="gap1" class="clip-dropdown">
       <option value="audio/ad/gap.wav">Gap</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
 
     <br />
 
-    <select id="ad2">
+    <select id="ad2" class="clip-dropdown">
       <option value="audio/ad/ad2.wav">Ad 2</option>
       <option value="audio/ad/ad1.wav">Ad 1</option>
       <option value="audio/ad/ad3.wav">Ad 3</option>
@@ -57,14 +57,14 @@
       <option value="audio/ad/target.wav">Target Wav</option>
     </select>
 
-    <select id="gap2">
+    <select id="gap2" class="clip-dropdown">
       <option value="audio/ad/gap.wav">Gap</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
 
     <br />
 
-    <select id="ad3">
+    <select id="ad3" class="clip-dropdown">
       <option value="audio/ad/ad3.wav">Ad 3</option>
       <option value="audio/ad/ad2.wav">Ad 2</option>
       <option value="audio/ad/ad1.wav">Ad 1</option>
@@ -77,14 +77,14 @@
       <option value="audio/ad/target.wav">Target Wav</option>
     </select>
 
-    <select id="gap3">
+    <select id="gap3" class="clip-dropdown">
       <option value="audio/ad/gap.wav">Gap</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
 
     <br />
 
-    <select id="ad4">
+    <select id="ad4" class="clip-dropdown">
       <option value="audio/ad/ad4.wav">Ad 4</option>
       <option value="audio/ad/ad2.wav">Ad 2</option>
       <option value="audio/ad/ad3.wav">Ad 3</option>
@@ -97,14 +97,14 @@
       <option value="audio/ad/target.wav">Target Wav</option>
     </select>
 
-    <select id="gap4">
+    <select id="gap4" class="clip-dropdown">
       <option value="audio/ad/gap.wav">Gap</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
 
     <br />
 
-    <select id="ad5">
+    <select id="ad5" class="clip-dropdown">
       <option value="audio/ad/ad5.wav">Ad 5</option>
       <option value="audio/ad/ad2.wav">Ad 2</option>
       <option value="audio/ad/ad3.wav">Ad 3</option>
@@ -117,14 +117,14 @@
       <option value="audio/ad/target.wav">Target Wav</option>
     </select>
 
-    <select id="gap5">
+    <select id="gap5" class="clip-dropdown">
       <option value="audio/ad/gap.wav">Gap</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
 
     <br />
 
-    <select id="ad6">
+    <select id="ad6" class="clip-dropdown">
       <option value="audio/ad/ad6.wav">Ad 6</option>
       <option value="audio/ad/ad2.wav">Ad 2</option>
       <option value="audio/ad/ad3.wav">Ad 3</option>
@@ -137,14 +137,14 @@
       <option value="audio/ad/target.wav">Target Wav</option>
     </select>
 
-    <select id="gap6">
+    <select id="gap6" class="clip-dropdown">
       <option value="audio/ad/gap.wav">Gap</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
 
     <br />
 
-    <select id="ad7">
+    <select id="ad7" class="clip-dropdown">
       <option value="audio/ad/ad7.wav">Ad 7</option>
       <option value="audio/ad/ad2.wav">Ad 2</option>
       <option value="audio/ad/ad3.wav">Ad 3</option>
@@ -157,7 +157,7 @@
       <option value="audio/ad/target.wav">Target Wav</option>
     </select>
 
-    <select id="gap7">
+    <select id="gap7" class="clip-dropdown">
       <option value="audio/ad/gap.wav">Gap</option>
       <option value="audio/ad/none.wav">None</option>
     </select>
@@ -165,7 +165,7 @@
     <br /><br />
 
     <!-- Station Out -->
-    <select id="station_out">
+    <select id="station_out" class="clip-dropdown">
       <option value="audio/station/absolute.wav">Absolute</option>
       <option value="audio/station/sting2.wav">Sting 2</option>
       <option value="audio/ad/none.wav">None</option>
@@ -174,7 +174,7 @@
 
   <br />
   <label for="videoImage">Select Image for Video:</label>
-  <select id="videoImage">
+  <select id="videoImage" class="clip-dropdown">
     <option value="images/absolute.jpg">Absolute</option>
     <option value="images/cover1.jpg">Cover 1</option>
     <option value="images/cover2.jpg">Cover 2</option>
@@ -195,23 +195,6 @@
 <video id="previewVideo" width="640" height="360" controls muted></video>
 
 <script>
-
-  function createAdBreak() {
-  const audioFiles = [
-    'station_in',
-    'gap0',
-    'ad1', 'gap1',
-    'ad2', 'gap2',
-    'ad3', 'gap3',
-    'ad4', 'gap4',
-    'ad5', 'gap5',
-    'ad6', 'gap6',
-    'ad7', 'gap7',
-    'station_out'
-  ].map(id => document.getElementById(id).value);
-
-  mergeAudio(audioFiles);
-}
   
 function getAudioContext() {
   if (!window.audioCtx) {
