@@ -235,10 +235,6 @@ async function buildSequence(context) {
 
   const totalLength = buffers.reduce((sum, b) => sum + b.length, 0);
 
-  if (totalLength === 0) {
-    throw new Error("Audio clips failed to load or were empty.");
-  }
-
   const output = context.createBuffer(1, totalLength, context.sampleRate);
   let offset = 0;
 
