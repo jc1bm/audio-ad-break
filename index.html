@@ -5,7 +5,7 @@
   <title>Ad In Situ Maker</title>
 </head>
 <body>
-  <h1>Ad In Situ Maker3</h1>
+  <h1>Ad In Situ Maker4</h1>
 
   <!-- Your existing dropdowns -->
   <div id="selectors">
@@ -195,6 +195,24 @@
 <video id="previewVideo" width="640" height="360" controls muted></video>
 
 <script>
+
+  function createAdBreak() {
+  const audioFiles = [
+    'station_in',
+    'gap0',
+    'ad1', 'gap1',
+    'ad2', 'gap2',
+    'ad3', 'gap3',
+    'ad4', 'gap4',
+    'ad5', 'gap5',
+    'ad6', 'gap6',
+    'ad7', 'gap7',
+    'station_out'
+  ].map(id => document.getElementById(id).value);
+
+  mergeAudio(audioFiles);
+}
+  
 function getAudioContext() {
   if (!window.audioCtx) {
     window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
