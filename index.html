@@ -207,7 +207,6 @@ const audioIds = [
 const selectedUrls = audioIds
   .map(id => document.getElementById(id)?.value)
   .filter(url => url && url !== "");
-}
   
 function getAudioContext() {
   if (!window.audioCtx) {
