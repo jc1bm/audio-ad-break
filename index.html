@@ -322,9 +322,6 @@ document.getElementById("exportAudio").addEventListener("click", async () => {
   const buffer = await buildSequence(context);
   const wavBlob = bufferToWav(buffer);
   downloadBlob(wavBlob, "adbreak.wav");
-}
-
-                                                        
 
 });
 </script>
