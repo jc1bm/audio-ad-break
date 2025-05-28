@@ -190,8 +190,6 @@
   <button id="exportAudio">Export Audio</button>
   <button id="exportVideo">Export Video</button>
 
-<script>
-
 <video>
     id="my-player"
     class="video-js"
@@ -226,6 +224,7 @@ var player = videojs('my-player', options, function onPlayerReady() {
   
 </video>
   
+<script>
   
 function getAudioContext() {
   if (!window.audioCtx) {
